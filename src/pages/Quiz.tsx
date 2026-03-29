@@ -5,9 +5,11 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { ArrowRight, CheckCircle2, XCircle, RotateCcw, BookOpen } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function Quiz() {
   const { moduleId } = useParams();
+  const { t } = useLanguage();
   const mod = modules.find((m) => m.id === moduleId);
   const questions = quizM1;
 
@@ -21,11 +23,7 @@ export default function Quiz() {
   const question = questions[currentQ];
   const progress = ((currentQ + (answered ? 1 : 0)) / questions.length) * 100;
 
-  const handleSelect = (index: number) => {
-    if (answered) return;
-    setSelected(index);
-  };
-
+  const handleSelect = (index: number) => { if (!answered) setSelected(index); };
   const handleSubmit = () => {
     if (selected === null) return;
     const correct = selected === question.correctIndex;
@@ -33,25 +31,11 @@ export default function Quiz() {
     setAnswers((a) => [...a, correct]);
     setAnswered(true);
   };
-
   const handleNext = () => {
-    if (currentQ + 1 >= questions.length) {
-      setFinished(true);
-    } else {
-      setCurrentQ((q) => q + 1);
-      setSelected(null);
-      setAnswered(false);
-    }
+    if (currentQ + 1 >= questions.length) { setFinished(true); }
+    else { setCurrentQ((q) => q + 1); setSelected(null); setAnswered(false); }
   };
-
-  const handleRetry = () => {
-    setCurrentQ(0);
-    setSelected(null);
-    setAnswered(false);
-    setScore(0);
-    setFinished(false);
-    setAnswers([]);
-  };
+  const handleRetry = () => { setCurrentQ(0); setSelected(null); setAnswered(false); setScore(0); setFinished(false); setAnswers([]); };
 
   const finalPercent = Math.round((score / questions.length) * 100);
   const passed = finalPercent >= 60;
@@ -62,16 +46,12 @@ export default function Quiz() {
         <div className={cn("w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6", passed ? "bg-success/15" : "bg-destructive/15")}>
           {passed ? <CheckCircle2 className="h-10 w-10 text-success" /> : <XCircle className="h-10 w-10 text-destructive" />}
         </div>
-        <h1 className="text-2xl font-bold mb-2">
-          {passed ? "Bravo ! Quiz réussi 🎉" : "Tu peux faire mieux !"}
-        </h1>
+        <h1 className="text-2xl font-bold mb-2">{passed ? t.quiz.passed : t.quiz.failed}</h1>
         <p className="text-3xl font-bold text-primary mb-2">{finalPercent}%</p>
         <p className="text-sm text-muted-foreground mb-6">
-          {score}/{questions.length} bonnes réponses
-          {!passed && " — Revois la leçon et retente."}
+          {score}/{questions.length} {t.quiz.goodAnswers}
+          {!passed && ` ${t.quiz.reviewHint}`}
         </p>
-
-        {/* Answers review */}
         <div className="space-y-2 mb-8 text-left">
           {questions.map((q, i) => (
             <div key={q.id} className={cn("p-3 rounded-lg text-sm", answers[i] ? "bg-success/10" : "bg-destructive/10")}>
@@ -85,16 +65,15 @@ export default function Quiz() {
             </div>
           ))}
         </div>
-
         <div className="flex gap-3 justify-center">
           {!passed && (
             <Button variant="outline" onClick={handleRetry}>
-              <RotateCcw className="h-4 w-4 mr-1" /> Refaire le quiz
+              <RotateCcw className="h-4 w-4 mr-1" /> {t.quiz.retryQuiz}
             </Button>
           )}
           <Button asChild>
             <Link to={`/modules/${moduleId}`}>
-              <BookOpen className="h-4 w-4 mr-1" /> {passed ? "Continuer" : "Revoir la leçon"}
+              <BookOpen className="h-4 w-4 mr-1" /> {passed ? t.quiz.continueBtn : t.quiz.reviewLesson}
             </Link>
           </Button>
         </div>
@@ -107,13 +86,12 @@ export default function Quiz() {
       <div className="mb-6">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span>{mod?.icon} {mod?.title} — Quiz</span>
-          <span>Question {currentQ + 1}/{questions.length}</span>
+          <span>{t.quiz.question} {currentQ + 1}/{questions.length}</span>
         </div>
         <Progress value={progress} className="h-2 [&>div]:bg-primary" />
       </div>
 
-      <p className="text-xs text-muted-foreground mb-2">Réponds sans stress : c'est pour apprendre.</p>
-
+      <p className="text-xs text-muted-foreground mb-2">{t.quiz.noStress}</p>
       <h2 className="text-lg font-semibold mb-6">{question.question}</h2>
 
       <div className="space-y-3 mb-6">
@@ -141,21 +119,17 @@ export default function Quiz() {
 
       {answered && (
         <div className="p-4 rounded-xl bg-muted/50 border mb-6 animate-fade-in">
-          <p className="text-sm font-medium mb-1">
-            {selected === question.correctIndex ? "✅ Bonne réponse !" : "❌ Pas tout à fait."}
-          </p>
+          <p className="text-sm font-medium mb-1">{selected === question.correctIndex ? t.quiz.correct : t.quiz.incorrect}</p>
           <p className="text-xs text-muted-foreground">{question.explanation}</p>
         </div>
       )}
 
       <div className="flex justify-end">
         {!answered ? (
-          <Button onClick={handleSubmit} disabled={selected === null}>
-            Valider
-          </Button>
+          <Button onClick={handleSubmit} disabled={selected === null}>{t.quiz.validate}</Button>
         ) : (
           <Button onClick={handleNext}>
-            {currentQ + 1 >= questions.length ? "Voir le résultat" : "Suivant"} <ArrowRight className="ml-1 h-4 w-4" />
+            {currentQ + 1 >= questions.length ? t.quiz.seeResult : t.quiz.nextQ} <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         )}
       </div>
