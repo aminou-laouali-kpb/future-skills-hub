@@ -3,20 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, BookOpen, User } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-
-const navItems = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Modules", href: "/modules" },
-  { label: "Mentorat", href: "/mentoring" },
-  { label: "Ressources", href: "/resources" },
-];
+import { useLanguage } from "@/i18n/LanguageContext";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
+  const { t } = useLanguage();
 
-  // Don't show navbar on landing
-  if (location.pathname === "/") return null;
+  const navItems = [
+    { label: t.nav.dashboard, href: "/dashboard" },
+    { label: t.nav.modules, href: "/modules" },
+    { label: t.nav.deliverables, href: "/deliverables" },
+    { label: t.nav.mentoring, href: "/mentoring" },
+    { label: t.nav.resources, href: "/resources" },
+  ];
+
+  // Don't show navbar on landing, login, onboarding
+  if (["/" , "/login", "/onboarding"].includes(location.pathname)) return null;
 
   return (
     <header className="sticky top-0 z-50 border-b bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
@@ -45,6 +49,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSwitcher />
           <Button variant="ghost" size="icon" className="rounded-full">
             <User className="h-4 w-4" />
           </Button>
