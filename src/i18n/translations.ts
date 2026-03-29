@@ -570,4 +570,12 @@ export const translations = {
   },
 } as const;
 
-export type Translations = typeof translations.fr;
+// Deep type that extracts the structure but allows any string values
+type DeepStringify<T> = {
+  [K in keyof T]: T[K] extends readonly (infer U)[]
+    ? U extends object ? Array<{ [P in keyof U]: string }> : string[]
+    : T[K] extends object ? DeepStringify<T[K]>
+    : string;
+};
+
+export type Translations = DeepStringify<typeof translations.fr>;
