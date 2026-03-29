@@ -20,7 +20,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("fs-lang", newLang);
   }, []);
 
-  const t = translations[lang];
+  const t = translations[lang] as any as Translations;
 
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>
