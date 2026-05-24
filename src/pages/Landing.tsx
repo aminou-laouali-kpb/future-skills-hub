@@ -7,7 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Landing() {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const icons = [BookOpen, Users, Lightbulb, Award];
 
   return (
