@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { modules, lessonsM1 } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ProgressBar";
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { CheckCircle2, Circle, ArrowLeft, ArrowRight, FileText } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -108,6 +109,16 @@ export default function ModuleDetail() {
           </div>
 
           <h1 className="text-xl md:text-2xl font-bold mb-6">{activeLesson.title}</h1>
+
+          {activeLesson.videoId && (
+            <VideoPlayer
+              videoId={activeLesson.videoId}
+              title={activeLesson.title}
+              durationSec={activeLesson.videoDurationSec}
+              sizeMB={activeLesson.videoSizeMB}
+              transcript={activeLesson.transcript}
+            />
+          )}
 
           <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
             <p className="text-muted-foreground">{activeLesson.content}</p>

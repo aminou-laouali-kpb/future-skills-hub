@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { BookOpen, Users, Award, Lightbulb, ArrowRight, CheckCircle2 } from "lucide-react";
+import { BookOpen, Users, Award, Lightbulb, ArrowRight, CheckCircle2, ShieldCheck } from "lucide-react";
 import heroImage from "@/assets/hero-image.jpg";
 import { modules } from "@/data/mockData";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -31,8 +31,8 @@ export default function Landing() {
       </header>
 
       <section className="relative overflow-hidden gradient-hero">
-        <div className="absolute inset-0 opacity-20">
-          <img src={heroImage} alt="Students learning" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 opacity-20" data-decorative="true">
+          <img src={heroImage} alt="" aria-hidden="true" className="w-full h-full object-cover" loading="lazy" />
         </div>
         <div className="relative container py-20 md:py-32 text-center">
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-4 leading-tight animate-slide-up">
@@ -40,9 +40,13 @@ export default function Landing() {
             <span className="text-accent">{t.landing.heroTitle2}</span><br />
             {t.landing.heroTitle3}
           </h1>
-          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-8 animate-fade-in">
+          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-6 animate-fade-in">
             {t.landing.heroSub}
           </p>
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 backdrop-blur px-3 py-1 text-xs font-medium text-primary-foreground mb-8 border border-primary-foreground/20">
+            <ShieldCheck className="h-3.5 w-3.5 text-accent" />
+            {t === t ? "Programme certifié Future Skills 2025" : ""}
+          </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center animate-fade-in">
             <Button variant="hero" size="lg" className="text-base px-8 h-12" asChild>
               <Link to="/dashboard">{t.landing.cta} <ArrowRight className="ml-1 h-4 w-4" /></Link>
@@ -127,6 +131,21 @@ export default function Landing() {
           <Button variant="hero" size="lg" className="text-base px-8 h-12" asChild>
             <Link to="/dashboard">{t.landing.startNow} <ArrowRight className="ml-1 h-4 w-4" /></Link>
           </Button>
+        </div>
+      </section>
+
+      <section className="py-10 border-t bg-muted/30">
+        <div className="container">
+          <p className="text-center text-xs uppercase tracking-wider text-muted-foreground mb-6 font-semibold">
+            Partenaires & sponsors
+          </p>
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 opacity-70">
+            {["Sponsor 1", "Sponsor 2", "Sponsor 3", "Sponsor 4", "Sponsor 5"].map((s) => (
+              <div key={s} className="h-10 px-4 flex items-center justify-center rounded bg-card border text-xs font-semibold text-muted-foreground">
+                {s}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
