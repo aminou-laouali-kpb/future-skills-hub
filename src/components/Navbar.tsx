@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, BookOpen, User } from "lucide-react";
+import { Menu, X, BookOpen, User, Calendar } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LiteModeToggle } from "@/components/LiteModeToggle";
+import { FontSizeControl } from "@/components/FontSizeControl";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -17,6 +19,7 @@ export function Navbar() {
     { label: t.nav.deliverables, href: "/deliverables" },
     { label: t.nav.mentoring, href: "/mentoring" },
     { label: t.nav.resources, href: "/resources" },
+    { label: "Plan 10j", href: "/plan-jour" },
   ];
 
   // Don't show navbar on landing, login, onboarding
@@ -49,6 +52,10 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-2">
+            <FontSizeControl />
+            <LiteModeToggle compact />
+          </div>
           <LanguageSwitcher />
           <Button variant="ghost" size="icon" className="rounded-full">
             <User className="h-4 w-4" />
@@ -83,6 +90,10 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
+            <div className="pt-2 mt-2 border-t flex items-center justify-between gap-2">
+              <FontSizeControl />
+              <LiteModeToggle compact />
+            </div>
           </div>
         </nav>
       )}

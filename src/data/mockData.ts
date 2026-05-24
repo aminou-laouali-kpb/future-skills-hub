@@ -21,6 +21,10 @@ export interface Lesson {
   order: number;
   completed: boolean;
   duration: string;
+  videoId?: string;
+  videoDurationSec?: number;
+  videoSizeMB?: number;
+  transcript?: string;
 }
 
 export interface QuizQuestion {
@@ -101,10 +105,10 @@ export const modules: Module[] = [
 ];
 
 export const lessonsM1: Lesson[] = [
-  { id: "l1", moduleId: "m1", title: "Internet : comment ça marche ?", content: "Internet est un réseau mondial qui connecte des milliards d'appareils. Comprendre ses bases est essentiel pour naviguer en toute sécurité...", order: 1, completed: true, duration: "8 min" },
-  { id: "l2", moduleId: "m1", title: "Les risques en ligne : phishing & arnaques", content: "Le phishing est une technique utilisée par les cybercriminels pour voler vos informations personnelles...", order: 2, completed: true, duration: "10 min" },
+  { id: "l1", moduleId: "m1", title: "Internet : comment ça marche ?", content: "Internet est un réseau mondial qui connecte des milliards d'appareils. Comprendre ses bases est essentiel pour naviguer en toute sécurité...", order: 1, completed: true, duration: "8 min", videoId: "PLACEHOLDER", videoDurationSec: 480, videoSizeMB: 18, transcript: "Transcription à venir : cette vidéo explique le fonctionnement d'Internet, les serveurs, et comment les données voyagent entre appareils." },
+  { id: "l2", moduleId: "m1", title: "Les risques en ligne : phishing & arnaques", content: "Le phishing est une technique utilisée par les cybercriminels pour voler vos informations personnelles...", order: 2, completed: true, duration: "10 min", videoId: "PLACEHOLDER", videoDurationSec: 600, videoSizeMB: 22 },
   { id: "l3", moduleId: "m1", title: "Fake news : vérifier ses sources", content: "Les fausses informations se propagent rapidement en ligne. Apprenez à vérifier avant de partager...", order: 3, completed: true, duration: "7 min" },
-  { id: "l4", moduleId: "m1", title: "Contenus générés par l'IA", content: "L'IA peut créer des textes, images et vidéos très réalistes. Comment les reconnaître ?", order: 4, completed: false, duration: "8 min" },
+  { id: "l4", moduleId: "m1", title: "Contenus générés par l'IA", content: "L'IA peut créer des textes, images et vidéos très réalistes. Comment les reconnaître ?", order: 4, completed: false, duration: "8 min", videoId: "PLACEHOLDER", videoDurationSec: 540, videoSizeMB: 20 },
   { id: "l5", moduleId: "m1", title: "Cybersécurité au quotidien", content: "Protégez vos comptes et vos données avec des pratiques simples mais efficaces...", order: 5, completed: false, duration: "10 min" },
   { id: "l6", moduleId: "m1", title: "Mots de passe & authentification", content: "Un bon mot de passe est votre première ligne de défense. Découvrez comment en créer un solide...", order: 6, completed: false, duration: "6 min" },
 ];

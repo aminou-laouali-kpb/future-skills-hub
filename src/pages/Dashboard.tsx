@@ -3,30 +3,54 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ProgressBar";
 import { StatusBadge } from "@/components/StatusBadge";
+import { CohortProgress } from "@/components/CohortProgress";
 import { currentUser, modules } from "@/data/mockData";
-import { ArrowRight, BookOpen, Calendar, MessageSquare, Target, Lock } from "lucide-react";
+import { ArrowRight, BookOpen, Calendar, MessageSquare, Target, Lock, Flame, Award } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useLiteMode } from "@/contexts/LiteModeContext";
 
 export default function Dashboard() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { streakDays } = useLiteMode();
   const progressPercent = Math.round((currentUser.day / currentUser.totalDays) * 100);
 
   return (
     <div className="container py-6 pb-24 md:pb-6 space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-xl md:text-2xl font-bold">
-          {t.dashboard.hello} {currentUser.firstName} 👋
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          {t.dashboard.dayProgress} {currentUser.day}/{currentUser.totalDays} {t.dashboard.keepGoing}
-        </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h1 className="text-xl md:text-2xl font-bold">
+            {t.dashboard.hello} {currentUser.firstName} 👋
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            {t.dashboard.dayProgress} {currentUser.day}/{currentUser.totalDays} {t.dashboard.keepGoing}
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 text-accent-foreground px-3 py-1 text-xs font-semibold">
+            <Flame className="h-3.5 w-3.5 text-accent" />
+            {streakDays} {lang === "fr" ? "jours" : "days"}
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
+            <Award className="h-3.5 w-3.5" />
+            {lang === "fr" ? "Certifié FS 2025" : "FS 2025 Certified"}
+          </span>
+        </div>
       </div>
 
       <Card className="shadow-card">
         <CardContent className="pt-6">
           <ProgressBar value={progressPercent} label={`${t.dashboard.globalProgress} — ${currentUser.cohortName}`} size="lg" />
+          <div className="mt-3">
+            <Link to="/plan-jour" className="text-xs text-primary font-medium inline-flex items-center gap-1 hover:underline">
+              <Calendar className="h-3 w-3" />
+              {lang === "fr" ? "Voir mon plan des 10 jours" : "View my 10-day plan"}
+              <ArrowRight className="h-3 w-3" />
+            </Link>
+          </div>
         </CardContent>
       </Card>
+
+      <CohortProgress />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="shadow-card hover:shadow-elevated transition-shadow">
