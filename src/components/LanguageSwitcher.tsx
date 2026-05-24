@@ -5,12 +5,12 @@ import { toast } from "sonner";
 export function LanguageSwitcher({ className }: { className?: string }) {
   const { lang, setLang } = useLanguage();
 
-  const langs: { code: "fr" | "en"; label: string }[] = [
+  const langs: { code: "fr" | "en" | "ha"; label: string }[] = [
     { code: "fr", label: "FR" },
     { code: "en", label: "EN" },
+    { code: "ha", label: "HA" },
   ];
   const upcoming = [
-    { label: "HA", name: "Haoussa" },
     { label: "ZAR", name: "Zarma" },
   ];
 
