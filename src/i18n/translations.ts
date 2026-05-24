@@ -42,6 +42,7 @@ export const translations = {
       readySub: "Rejoins ta cohorte et démarre ton parcours en 10 jours.",
       startNow: "Commencer maintenant",
       footer: { support: "Support", faq: "FAQ", contact: "Contact" },
+      certifiedBadge: "Programme certifié Future Skills 2025",
     },
     // Auth
     auth: {
