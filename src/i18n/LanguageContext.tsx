@@ -12,7 +12,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>(() => {
     const stored = localStorage.getItem("fs-lang");
-    return (stored === "en" || stored === "fr") ? stored : "fr";
+    return (stored === "en" || stored === "fr" || stored === "ha") ? stored : "fr";
   });
 
   const setLang = useCallback((newLang: Lang) => {
