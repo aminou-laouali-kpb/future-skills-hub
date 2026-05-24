@@ -7,7 +7,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Landing() {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const icons = [BookOpen, Users, Lightbulb, Award];
 
   return (
@@ -45,7 +45,7 @@ export default function Landing() {
           </p>
           <div className="inline-flex items-center gap-2 rounded-full bg-primary-foreground/10 backdrop-blur px-3 py-1 text-xs font-medium text-primary-foreground mb-8 border border-primary-foreground/20">
             <ShieldCheck className="h-3.5 w-3.5 text-accent" />
-            {lang === "fr" ? "Programme certifié Future Skills 2025" : "Certified Future Skills 2025 program"}
+            {t.landing.certifiedBadge}
           </div>
           <div className="flex flex-col sm:flex-row gap-3 justify-center animate-fade-in">
             <Button variant="hero" size="lg" className="text-base px-8 h-12" asChild>
