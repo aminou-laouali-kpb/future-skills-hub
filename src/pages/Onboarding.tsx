@@ -23,6 +23,7 @@ export default function Onboarding() {
   const [level, setLevel] = useState("beginner");
   const [goal, setGoal] = useState("employment");
   const [whatsapp, setWhatsapp] = useState(false);
+  const [phone, setPhone] = useState("");
 
   const progress = (step / totalSteps) * 100;
 
@@ -111,9 +112,20 @@ export default function Onboarding() {
                   ))}
                 </RadioGroup>
               </div>
-              <div className="flex items-center gap-2 pt-2">
-                <Checkbox id="whatsapp" checked={whatsapp} onCheckedChange={(c) => setWhatsapp(!!c)} />
-                <Label htmlFor="whatsapp" className="font-normal text-sm">{t.onboarding.whatsapp}</Label>
+              <div className="space-y-2 pt-2 border-t">
+                <div className="flex items-center gap-2">
+                  <Checkbox id="whatsapp" checked={whatsapp} onCheckedChange={(c) => setWhatsapp(!!c)} />
+                  <Label htmlFor="whatsapp" className="font-normal text-sm">{t.onboarding.whatsapp}</Label>
+                </div>
+                {whatsapp && (
+                  <Input
+                    type="tel"
+                    placeholder="+227 90 00 00 00"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="mt-1.5"
+                  />
+                )}
               </div>
             </div>
           )}

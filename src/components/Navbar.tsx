@@ -90,6 +90,10 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
+            <div className="pt-2 mt-2 border-t flex items-center justify-between gap-2">
+              <FontSizeControl />
+              <LiteModeToggle compact />
+            </div>
           </div>
         </nav>
       )}
