@@ -333,6 +333,7 @@ export const translations = {
       readySub: "Join your cohort and begin your 10-day journey.",
       startNow: "Start now",
       footer: { support: "Support", faq: "FAQ", contact: "Contact" },
+      certifiedBadge: "Certified Future Skills 2025 program",
     },
     auth: {
       title: "Log in",
