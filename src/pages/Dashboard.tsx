@@ -23,7 +23,7 @@ export default function Dashboard() {
   const continueHref = continueModule ? `/modules/${continueModule.id}` : "/modules";
 
   return (
-    <div className="container py-6 pb-24 md:pb-6 space-y-6 animate-fade-in">
+    <div className="container py-6 pb-6 space-y-6 animate-fade-in">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl md:text-2xl font-bold">
@@ -152,13 +152,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-card/95 backdrop-blur border-t md:hidden">
-        <Button className="w-full h-12" asChild>
-          <Link to={continueHref}>
-            {t.dashboard.continue} <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
     </div>
   );
 }

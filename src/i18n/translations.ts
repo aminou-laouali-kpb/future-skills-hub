@@ -13,6 +13,20 @@ export const translations = {
       support: "Support",
       dayPlan: "Plan 10j",
     },
+    mobileNav: {
+      label: "Navigation principale",
+      dashboard: "Accueil",
+      modules: "Modules",
+      deliverables: "Livrables",
+      more: "Plus",
+    },
+    a11y: {
+      skipToContent: "Aller au contenu principal",
+    },
+    offline: {
+      banner: "Mode hors ligne — le contenu en cache reste disponible.",
+      cachedBadge: "Lecture hors ligne",
+    },
     // Landing
     landing: {
       login: "Se connecter",
@@ -397,6 +411,20 @@ export const translations = {
       support: "Support",
       dayPlan: "10-day plan",
     },
+    mobileNav: {
+      label: "Main navigation",
+      dashboard: "Home",
+      modules: "Modules",
+      deliverables: "Deliverables",
+      more: "More",
+    },
+    a11y: {
+      skipToContent: "Skip to main content",
+    },
+    offline: {
+      banner: "Offline mode — cached content is still available.",
+      cachedBadge: "Offline reading",
+    },
     landing: {
       login: "Log in",
       cta: "Access my cohort",
@@ -764,6 +792,20 @@ export const translations = {
       admin: "Admin",
       support: "Taimako",
       dayPlan: "Shirin 10k",
+    },
+    mobileNav: {
+      label: "Babban kewayawa",
+      dashboard: "Gida",
+      modules: "Darussa",
+      deliverables: "Aikace-aikace",
+      more: "Ƙari",
+    },
+    a11y: {
+      skipToContent: "Je zuwa babban abun ciki",
+    },
+    offline: {
+      banner: "Yanayin layi — abubuwan da aka adana suna samuwa.",
+      cachedBadge: "Karatu ba tare da layi ba",
     },
     landing: {
       login: "Shiga",
