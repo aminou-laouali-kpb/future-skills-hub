@@ -31,6 +31,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
       - name: Build
         run: npm run build
         env:
@@ -42,6 +45,13 @@ jobs:
         with:
           path: dist
 
+      - name: Upload build artifact (backup)
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ github.sha }}
+          path: dist
+          retention-days: 14
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -49,5 +59,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4

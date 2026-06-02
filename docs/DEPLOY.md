@@ -1,35 +1,81 @@
 # Déploiement Future Skills
 
-## Application (GitHub Pages)
+## État actuel
 
-Chaque push sur `main` déclenche le workflow `.github/workflows/deploy.yml` :
+Le workflow **Deploy to GitHub Pages** sur `main` exécute déjà :
 
-1. `npm ci` → `npm test` → `npm run build`
-2. Publication sur GitHub Pages
+- `npm ci` → `npm test` → `npm run build` ✅  
+- Publication Pages ❌ tant que Pages n’est pas activé (erreur `404` sur `deploy-pages`).
 
-URL attendue : `https://<org>.github.io/future-skills-hub/`
+Dernier run en échec : voir [Actions](https://github.com/kpb-global/future-skills-hub/actions/workflows/deploy.yml).
 
-Dans le dépôt GitHub : **Settings → Pages → Source** = *GitHub Actions* (si ce n’est pas déjà fait).
+---
 
-Variables d’environnement de build (secrets **Settings → Secrets → Actions**) :
+## 1. Activer GitHub Pages (obligatoire, ~2 min)
 
-| Secret | Description |
-|--------|-------------|
-| `VITE_SUPABASE_URL` | URL projet Supabase |
-| `VITE_SUPABASE_ANON_KEY` | Clé anon publique |
+1. Ouvrir **https://github.com/kpb-global/future-skills-hub/settings/pages**
+2. **Build and deployment → Source** : choisir **GitHub Actions** (pas « Deploy from a branch »).
+3. Enregistrer si un bouton **Save** apparaît.
+4. Relancer le déploiement :
+   - **Actions** → **Deploy to GitHub Pages** → **Run workflow** → branche `main`
 
-Sans ces secrets, l’app tourne en **mode démo** (OTP `123456`, données en `localStorage`).
+URL attendue : **https://kpb-global.github.io/future-skills-hub/**
 
-## Supabase (base de données)
+> Dépôt **privé** : GitHub Pages peut nécessiter un plan **Team** ou une politique org autorisant Pages. Sinon utiliser **Lovable** (ci-dessous).
 
-Appliquer les migrations dans l’ordre :
+### Artefact de secours
+
+Chaque run produit aussi un zip **`dist-<commit>`** dans l’onglet **Artifacts** du workflow (téléchargement manuel ou hébergement ailleurs).
+
+---
+
+## 2. Secrets Supabase (production, optionnel)
+
+**Settings → Secrets and variables → Actions → New repository secret**
+
+| Secret | Valeur |
+|--------|--------|
+| `VITE_SUPABASE_URL` | `https://xxxx.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | clé **anon** (publique) du projet |
+
+Sans ces secrets, l’app déployée reste en **mode démo** (OTP `123456`, données en `localStorage`).
+
+Relancer le workflow après ajout des secrets.
+
+---
+
+## 3. Migrations Supabase (base de données)
+
+Dans le [dashboard Supabase](https://supabase.com/dashboard) → **SQL Editor**, exécuter **dans l’ordre** :
 
 1. `supabase/migrations/20250602000000_initial_schema.sql`
 2. `supabase/migrations/20250602100000_progress_deliverables.sql`
 3. `supabase/migrations/20250602120000_mentoring_certificates.sql`
 
-Via CLI : `supabase db push` depuis un projet lié.
+Ou avec la CLI (projet lié) :
 
-## Alternative Lovable
+```bash
+npx supabase link --project-ref <PROJECT_REF>
+npx supabase db push
+```
 
-Le README racine décrit aussi la publication via [Lovable](https://lovable.dev) (Share → Publish).
+Vérifier **Authentication → Providers** : Email et/ou Phone (OTP) activés.
+
+---
+
+## 4. Développement local
+
+```bash
+cp .env.example .env
+# Renseigner VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY
+npm install
+npm run dev
+```
+
+Sans `.env` : mode démo, code OTP **`123456`**.
+
+---
+
+## 5. Alternative Lovable
+
+README racine : [Lovable](https://lovable.dev) → **Share → Publish** (hébergement géré par Lovable).
