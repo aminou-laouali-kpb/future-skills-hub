@@ -1,8 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Après activation : Settings → Pages → Source = GitHub Actions
+# https://github.com/kpb-global/future-skills-hub/settings/pages
+# Puis : Actions → Deploy to GitHub Pages → Run workflow
+
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -15,8 +17,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -25,14 +30,10 @@ jobs:
           node-version: "20"
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm ci
+      - run: npm test
 
-      - name: Test
-        run: npm test
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v5
 
       - name: Build
         run: npm run build
@@ -45,20 +46,6 @@ jobs:
         with:
           path: dist
 
-      - name: Upload build artifact (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-${{ github.sha }}
-          path: dist
-          retention-days: 14
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

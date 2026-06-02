@@ -16,8 +16,8 @@ Dernier run en échec : voir [Actions](https://github.com/kpb-global/future-skil
 1. Ouvrir **https://github.com/kpb-global/future-skills-hub/settings/pages**
 2. **Build and deployment → Source** : choisir **GitHub Actions** (pas « Deploy from a branch »).
 3. Enregistrer si un bouton **Save** apparaît.
-4. Relancer le déploiement :
-   - **Actions** → **Deploy to GitHub Pages** → **Run workflow** → branche `main`
+4. Lancer le déploiement :
+   - **Actions** → **Deploy to GitHub Pages** → **Run workflow`
 
 URL attendue : **https://kpb-global.github.io/future-skills-hub/**
 
