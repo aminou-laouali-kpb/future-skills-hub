@@ -1,4 +1,9 @@
 import { mentoringSessions, type MentoringSession } from "@/data/mentoringCatalog";
+import { canSyncToSupabase } from "@/lib/userId";
+import {
+  buildRemoteMentoringState,
+  pushRemoteMentoringRegistration,
+} from "@/services/mentoringRemoteService";
 
 const STORAGE_PREFIX = "fs-mentoring-";
 
@@ -55,6 +60,13 @@ export function registerForSession(userId: string, sessionId: string): Mentoring
   state.spotsBySession[sessionId] = spotsLeft - 1;
   saveMentoringRegistrations(userId, state);
   window.dispatchEvent(new Event("fs-mentoring-updated"));
+
+  if (canSyncToSupabase(userId)) {
+    void pushRemoteMentoringRegistration(userId, sessionId).catch((err) => {
+      console.warn("[Future Skills] mentoring sync failed", err);
+    });
+  }
+
   return state;
 }
 
@@ -73,4 +85,16 @@ export function listSessionsWithRegistration(userId: string) {
     registered: state.registeredSessionIds.includes(session.id),
     spotsLeft: session.past ? 0 : (state.spotsBySession[session.id] ?? 0),
   }));
+}
+
+/** Replace local cache from Supabase (called on hydrate). */
+export function applyMentoringState(userId: string, state: MentoringRegistrationState): void {
+  saveMentoringRegistrations(userId, state);
+  window.dispatchEvent(new Event("fs-mentoring-updated"));
+}
+
+export async function refreshMentoringFromRemote(userId: string): Promise<void> {
+  if (!canSyncToSupabase(userId)) return;
+  const remote = await buildRemoteMentoringState(userId);
+  if (remote) applyMentoringState(userId, remote);
 }
