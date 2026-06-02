@@ -1,5 +1,6 @@
 import { modules as moduleCatalog, type Module } from "@/data/mockData";
 import { getLessonsForModule, MODULE_IDS, type ModuleId } from "@/data/curriculum";
+import { pushRemoteLessonComplete, pushRemoteQuizScore } from "@/services/progressRemoteService";
 
 export const LESSON_THRESHOLD_PERCENT = 80;
 export const QUIZ_PASS_PERCENT = 60;
@@ -85,12 +86,25 @@ export function enrichModules(progress: UserProgressData): Module[] {
   });
 }
 
+function syncLessonToRemote(userId: string, lessonId: string) {
+  void pushRemoteLessonComplete(userId, lessonId).catch((err) => {
+    console.warn("[Future Skills] sync lesson failed", err);
+  });
+}
+
+function syncQuizToRemote(userId: string, moduleId: ModuleId, percent: number) {
+  void pushRemoteQuizScore(userId, moduleId, percent).catch((err) => {
+    console.warn("[Future Skills] sync quiz failed", err);
+  });
+}
+
 export function markLessonComplete(userId: string, lessonId: string): UserProgressData {
   const data = loadProgress(userId);
   if (!data.completedLessonIds.includes(lessonId)) {
     data.completedLessonIds.push(lessonId);
   }
   saveProgress(userId, data);
+  syncLessonToRemote(userId, lessonId);
   return data;
 }
 
@@ -99,7 +113,6 @@ export function saveQuizScore(userId: string, moduleId: ModuleId, percent: numbe
   const prev = data.quizBestByModule[moduleId] ?? 0;
   data.quizBestByModule[moduleId] = Math.max(prev, percent);
   saveProgress(userId, data);
+  syncQuizToRemote(userId, moduleId, data.quizBestByModule[moduleId]!);
   return data;
 }
-
-

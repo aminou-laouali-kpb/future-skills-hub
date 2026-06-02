@@ -36,9 +36,9 @@ export default function Deliverables() {
     setChecks([false, false, false]);
   };
 
-  const handleSubmit = (asDraft: boolean) => {
+  const handleSubmit = async (asDraft: boolean) => {
     if (!selectedModule || !selectedType) return;
-    addDeliverable({
+    await addDeliverable({
       moduleId: selectedModule,
       type: selectedType,
       fileName: fileName || undefined,

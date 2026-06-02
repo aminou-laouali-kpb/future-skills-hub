@@ -10,6 +10,7 @@ import {
 import { getLessonsForModule } from "@/data/curriculum";
 import type { Lesson, Module } from "@/data/mockData";
 import type { ModuleId } from "@/data/curriculum";
+import { LEARNER_HYDRATED_EVENT } from "@/services/learnerSyncService";
 
 const GUEST_ID = "guest";
 
@@ -21,9 +22,11 @@ function useProgressUserId(): string {
 function subscribe(_userId: string, onStoreChange: () => void) {
   const handler = () => onStoreChange();
   window.addEventListener("fs-progress-updated", handler);
+  window.addEventListener(LEARNER_HYDRATED_EVENT, handler);
   window.addEventListener("storage", handler);
   return () => {
     window.removeEventListener("fs-progress-updated", handler);
+    window.removeEventListener(LEARNER_HYDRATED_EVENT, handler);
     window.removeEventListener("storage", handler);
   };
 }

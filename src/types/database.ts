@@ -54,6 +54,64 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
       };
+      user_lesson_progress: {
+        Row: { user_id: string; lesson_id: string; completed_at: string };
+        Insert: { user_id: string; lesson_id: string; completed_at?: string };
+        Update: Partial<Database["public"]["Tables"]["user_lesson_progress"]["Insert"]>;
+      };
+      user_quiz_scores: {
+        Row: { user_id: string; module_id: string; best_percent: number; updated_at: string };
+        Insert: { user_id: string; module_id: string; best_percent: number; updated_at?: string };
+        Update: Partial<Database["public"]["Tables"]["user_quiz_scores"]["Insert"]>;
+      };
+      deliverables: {
+        Row: {
+          id: string;
+          user_id: string;
+          module_id: string;
+          type: string;
+          file_name: string | null;
+          link_url: string | null;
+          context: string;
+          status: string;
+          submitted_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          module_id: string;
+          type: string;
+          file_name?: string | null;
+          link_url?: string | null;
+          context?: string;
+          status: string;
+          submitted_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["deliverables"]["Insert"]>;
+      };
+      deliverable_feedback: {
+        Row: {
+          deliverable_id: string;
+          score: number | null;
+          strengths: string | null;
+          improvements: string | null;
+          next_steps: string | null;
+          mentor_name: string | null;
+          feedback_date: string | null;
+        };
+        Insert: {
+          deliverable_id: string;
+          score?: number | null;
+          strengths?: string | null;
+          improvements?: string | null;
+          next_steps?: string | null;
+          mentor_name?: string | null;
+          feedback_date?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["deliverable_feedback"]["Insert"]>;
+      };
     };
   };
 }
