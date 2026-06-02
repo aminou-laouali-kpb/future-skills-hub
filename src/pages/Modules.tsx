@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import { modules } from "@/data/mockData";
 import { StatusBadge } from "@/components/StatusBadge";
 import { ProgressBar } from "@/components/ProgressBar";
 import { Button } from "@/components/ui/button";
@@ -7,11 +6,13 @@ import { ArrowRight, Lock, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useProgressStore } from "@/hooks/useProgress";
 
 type Filter = "all" | "in_progress" | "locked" | "completed";
 
 export default function Modules() {
   const { t } = useLanguage();
+  const { modules } = useProgressStore();
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = filter === "all" ? modules : modules.filter((m) => m.status === filter);

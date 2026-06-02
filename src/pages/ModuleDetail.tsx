@@ -1,22 +1,29 @@
 import { useParams, Link } from "react-router-dom";
-import { modules, lessonsM1 } from "@/data/mockData";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ProgressBar } from "@/components/ProgressBar";
 import { VideoPlayer } from "@/components/VideoPlayer";
-import { CheckCircle2, Circle, ArrowLeft, ArrowRight, FileText } from "lucide-react";
-import { useState } from "react";
+import { CheckCircle2, Circle, ArrowLeft, ArrowRight, FileText, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useLessonsWithProgress, useModule, useProgressStore } from "@/hooks/useProgress";
 
 export default function ModuleDetail() {
   const { moduleId } = useParams();
   const { t } = useLanguage();
-  const mod = modules.find((m) => m.id === moduleId);
-  const lessons = lessonsM1;
-  const [activeLesson, setActiveLesson] = useState(lessons.find((l) => !l.completed) || lessons[0]);
+  const mod = useModule(moduleId);
+  const lessons = useLessonsWithProgress(moduleId);
+  const { completeLesson } = useProgressStore();
+  const [activeLesson, setActiveLesson] = useState(lessons[0]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  if (!mod) {
+  useEffect(() => {
+    if (lessons.length) {
+      setActiveLesson(lessons.find((l) => !l.completed) ?? lessons[0]);
+    }
+  }, [moduleId, lessons.length]);
+
+  if (!mod || !moduleId) {
     return (
       <div className="container py-12 text-center">
         <p className="text-muted-foreground">{t.moduleDetail.notFound}</p>
@@ -27,7 +34,57 @@ export default function ModuleDetail() {
     );
   }
 
+  if (mod.status === "locked") {
+    return (
+      <div className="container py-12 text-center max-w-md mx-auto">
+        <Lock className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
+        <p className="text-muted-foreground mb-4">{t.dashboard.unlockPrev}</p>
+        <Button variant="outline" asChild>
+          <Link to="/modules">{t.moduleDetail.backToModules}</Link>
+        </Button>
+      </div>
+    );
+  }
+
+  if (!lessons.length || !activeLesson) {
+    return null;
+  }
+
   const currentIndex = lessons.findIndex((l) => l.id === activeLesson.id);
+
+  const handleMarkDone = () => {
+    completeLesson(activeLesson.id);
+    const next = lessons[currentIndex + 1];
+    if (next) setActiveLesson(next);
+  };
+
+  const lessonList = (
+    <>
+      {lessons.map((l) => (
+        <button
+          key={l.id}
+          onClick={() => setActiveLesson(l)}
+          className={cn(
+            "w-full flex items-center gap-2 p-2.5 rounded-lg text-left text-sm transition-colors",
+            activeLesson.id === l.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+          )}
+        >
+          {l.completed ? <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" /> : <Circle className="h-4 w-4 flex-shrink-0" />}
+          <span className="truncate">{l.title}</span>
+          <span className="ml-auto text-[10px] text-muted-foreground">{l.duration}</span>
+        </button>
+      ))}
+      <div className="border-t pt-2 mt-2">
+        <Link
+          to={`/modules/${moduleId}/quiz`}
+          className="w-full flex items-center gap-2 p-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          <FileText className="h-4 w-4" />
+          {t.moduleDetail.moduleQuiz}
+        </Link>
+      </div>
+    </>
+  );
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)]">
@@ -36,34 +93,12 @@ export default function ModuleDetail() {
           <Link to="/modules" className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-2">
             <ArrowLeft className="h-3 w-3" /> {t.moduleDetail.backModules}
           </Link>
-          <h2 className="font-semibold text-sm">{mod.icon} {mod.title}</h2>
+          <h2 className="font-semibold text-sm">
+            {mod.icon} {mod.title}
+          </h2>
           <ProgressBar value={mod.progress} size="sm" className="mt-2" />
         </div>
-        <nav className="flex-1 p-2 space-y-0.5">
-          {lessons.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => setActiveLesson(l)}
-              className={cn(
-                "w-full flex items-center gap-2 p-2.5 rounded-lg text-left text-sm transition-colors",
-                activeLesson.id === l.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              {l.completed ? <CheckCircle2 className="h-4 w-4 text-success flex-shrink-0" /> : <Circle className="h-4 w-4 flex-shrink-0" />}
-              <span className="truncate">{l.title}</span>
-              <span className="ml-auto text-[10px] text-muted-foreground">{l.duration}</span>
-            </button>
-          ))}
-          <div className="border-t pt-2 mt-2">
-            <Link
-              to={`/modules/${moduleId}/quiz`}
-              className="w-full flex items-center gap-2 p-2.5 rounded-lg text-sm text-muted-foreground hover:bg-muted hover:text-foreground"
-            >
-              <FileText className="h-4 w-4" />
-              {t.moduleDetail.moduleQuiz}
-            </Link>
-          </div>
-        </nav>
+        <nav className="flex-1 p-2 space-y-0.5">{lessonList}</nav>
       </aside>
 
       <div className="lg:hidden fixed bottom-20 right-4 z-40">
@@ -77,24 +112,14 @@ export default function ModuleDetail() {
           <div className="absolute inset-0 bg-foreground/20" onClick={() => setSidebarOpen(false)} />
           <aside className="absolute left-0 top-0 bottom-0 w-72 bg-card shadow-elevated overflow-y-auto animate-fade-in">
             <div className="p-4 border-b flex items-center justify-between">
-              <h2 className="font-semibold text-sm">{mod.icon} {mod.title}</h2>
-              <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>✕</Button>
+              <h2 className="font-semibold text-sm">
+                {mod.icon} {mod.title}
+              </h2>
+              <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
+                ✕
+              </Button>
             </div>
-            <nav className="p-2 space-y-0.5">
-              {lessons.map((l) => (
-                <button
-                  key={l.id}
-                  onClick={() => { setActiveLesson(l); setSidebarOpen(false); }}
-                  className={cn(
-                    "w-full flex items-center gap-2 p-2.5 rounded-lg text-left text-sm transition-colors",
-                    activeLesson.id === l.id ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  {l.completed ? <CheckCircle2 className="h-4 w-4 text-success" /> : <Circle className="h-4 w-4" />}
-                  <span className="truncate">{l.title}</span>
-                </button>
-              ))}
-            </nav>
+            <nav className="p-2 space-y-0.5">{lessonList}</nav>
           </aside>
         </div>
       )}
@@ -104,7 +129,9 @@ export default function ModuleDetail() {
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
             <span>{mod.shortTitle}</span>
             <span>›</span>
-            <span>{t.moduleDetail.lesson} {activeLesson.order}/{lessons.length}</span>
+            <span>
+              {t.moduleDetail.lesson} {activeLesson.order}/{lessons.length}
+            </span>
             <span className="ml-auto">{activeLesson.duration}</span>
           </div>
 
@@ -129,7 +156,7 @@ export default function ModuleDetail() {
             <p className="text-muted-foreground">{t.moduleDetail.nextLessonText}</p>
           </div>
 
-          <div className="flex items-center justify-between mt-8 pt-6 border-t">
+          <div className="flex items-center justify-between mt-8 pt-6 border-t gap-2 flex-wrap">
             <Button
               variant="outline"
               disabled={currentIndex === 0}
@@ -139,7 +166,7 @@ export default function ModuleDetail() {
             </Button>
 
             {!activeLesson.completed && (
-              <Button variant="secondary">
+              <Button variant="secondary" onClick={handleMarkDone}>
                 <CheckCircle2 className="h-4 w-4 mr-1" /> {t.moduleDetail.markDone}
               </Button>
             )}

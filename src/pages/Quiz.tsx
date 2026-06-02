@@ -1,5 +1,8 @@
 import { useParams, Link } from "react-router-dom";
-import { quizM1, modules } from "@/data/mockData";
+import { getQuizForModule } from "@/data/curriculum";
+import type { ModuleId } from "@/data/curriculum";
+import { useModule, useProgressStore } from "@/hooks/useProgress";
+import { QUIZ_PASS_PERCENT } from "@/services/progressService";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
@@ -10,8 +13,9 @@ import { useLanguage } from "@/i18n/LanguageContext";
 export default function Quiz() {
   const { moduleId } = useParams();
   const { t } = useLanguage();
-  const mod = modules.find((m) => m.id === moduleId);
-  const questions = quizM1;
+  const mod = useModule(moduleId);
+  const { recordQuiz } = useProgressStore();
+  const questions = moduleId ? getQuizForModule(moduleId) : [];
 
   const [currentQ, setCurrentQ] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -20,10 +24,23 @@ export default function Quiz() {
   const [finished, setFinished] = useState(false);
   const [answers, setAnswers] = useState<boolean[]>([]);
 
+  if (!questions.length) {
+    return (
+      <div className="container py-12 text-center">
+        <Button variant="outline" asChild>
+          <Link to="/modules">{t.moduleDetail.backToModules}</Link>
+        </Button>
+      </div>
+    );
+  }
+
   const question = questions[currentQ];
   const progress = ((currentQ + (answered ? 1 : 0)) / questions.length) * 100;
 
-  const handleSelect = (index: number) => { if (!answered) setSelected(index); };
+  const handleSelect = (index: number) => {
+    if (!answered) setSelected(index);
+  };
+
   const handleSubmit = () => {
     if (selected === null) return;
     const correct = selected === question.correctIndex;
@@ -31,14 +48,30 @@ export default function Quiz() {
     setAnswers((a) => [...a, correct]);
     setAnswered(true);
   };
+
   const handleNext = () => {
-    if (currentQ + 1 >= questions.length) { setFinished(true); }
-    else { setCurrentQ((q) => q + 1); setSelected(null); setAnswered(false); }
+    if (currentQ + 1 >= questions.length) {
+      const pct = Math.round((score / questions.length) * 100);
+      if (moduleId) recordQuiz(moduleId as ModuleId, pct);
+      setFinished(true);
+    } else {
+      setCurrentQ((q) => q + 1);
+      setSelected(null);
+      setAnswered(false);
+    }
   };
-  const handleRetry = () => { setCurrentQ(0); setSelected(null); setAnswered(false); setScore(0); setFinished(false); setAnswers([]); };
+
+  const handleRetry = () => {
+    setCurrentQ(0);
+    setSelected(null);
+    setAnswered(false);
+    setScore(0);
+    setFinished(false);
+    setAnswers([]);
+  };
 
   const finalPercent = Math.round((score / questions.length) * 100);
-  const passed = finalPercent >= 60;
+  const passed = finalPercent >= QUIZ_PASS_PERCENT;
 
   if (finished) {
     return (
@@ -72,7 +105,7 @@ export default function Quiz() {
             </Button>
           )}
           <Button asChild>
-            <Link to={`/modules/${moduleId}`}>
+            <Link to={passed ? "/modules" : `/modules/${moduleId}`}>
               <BookOpen className="h-4 w-4 mr-1" /> {passed ? t.quiz.continueBtn : t.quiz.reviewLesson}
             </Link>
           </Button>
@@ -85,8 +118,12 @@ export default function Quiz() {
     <div className="container max-w-lg py-8 animate-fade-in">
       <div className="mb-6">
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-          <span>{mod?.icon} {mod?.title} — Quiz</span>
-          <span>{t.quiz.question} {currentQ + 1}/{questions.length}</span>
+          <span>
+            {mod?.icon} {mod?.title} — Quiz
+          </span>
+          <span>
+            {t.quiz.question} {currentQ + 1}/{questions.length}
+          </span>
         </div>
         <Progress value={progress} className="h-2 [&>div]:bg-primary" />
       </div>
@@ -126,7 +163,9 @@ export default function Quiz() {
 
       <div className="flex justify-end">
         {!answered ? (
-          <Button onClick={handleSubmit} disabled={selected === null}>{t.quiz.validate}</Button>
+          <Button onClick={handleSubmit} disabled={selected === null}>
+            {t.quiz.validate}
+          </Button>
         ) : (
           <Button onClick={handleNext}>
             {currentQ + 1 >= questions.length ? t.quiz.seeResult : t.quiz.nextQ} <ArrowRight className="ml-1 h-4 w-4" />

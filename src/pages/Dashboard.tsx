@@ -4,15 +4,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ProgressBar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { CohortProgress } from "@/components/CohortProgress";
-import { currentUser, modules } from "@/data/mockData";
 import { ArrowRight, BookOpen, Calendar, MessageSquare, Target, Lock, Flame, Award } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useLiteMode } from "@/contexts/LiteModeContext";
+import { useLearnerDisplay } from "@/hooks/useLearnerDisplay";
+import { useProgressStore } from "@/hooks/useProgress";
 
 export default function Dashboard() {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
+  const learner = useLearnerDisplay();
+  const { modules } = useProgressStore();
   const { streakDays } = useLiteMode();
-  const progressPercent = Math.round((currentUser.day / currentUser.totalDays) * 100);
+  const progressPercent = Math.round((learner.day / learner.totalDays) * 100);
+  const continueModule = modules.find((m) => m.status === "in_progress") ?? modules.find((m) => m.status !== "locked");
+  const continueHref = continueModule ? `/modules/${continueModule.id}` : "/modules";
 
   return (
     <div className="container py-6 pb-24 md:pb-6 space-y-6 animate-fade-in">
@@ -28,22 +33,22 @@ export default function Dashboard() {
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 text-accent-foreground px-3 py-1 text-xs font-semibold">
             <Flame className="h-3.5 w-3.5 text-accent" />
-            {streakDays} {lang === "fr" ? "jours" : "days"}
+            {streakDays} {t.dashboard.streakDays}
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
             <Award className="h-3.5 w-3.5" />
-            {lang === "fr" ? "Certifié FS 2025" : "FS 2025 Certified"}
+            {t.dashboard.certifiedBadgeShort}
           </span>
         </div>
       </div>
 
       <Card className="shadow-card">
         <CardContent className="pt-6">
-          <ProgressBar value={progressPercent} label={`${t.dashboard.globalProgress} — ${currentUser.cohortName}`} size="lg" />
+          <ProgressBar value={progressPercent} label={`${t.dashboard.globalProgress} — ${learner.cohortName}`} size="lg" />
           <div className="mt-3">
             <Link to="/plan-jour" className="text-xs text-primary font-medium inline-flex items-center gap-1 hover:underline">
               <Calendar className="h-3 w-3" />
-              {lang === "fr" ? "Voir mon plan des 10 jours" : "View my 10-day plan"}
+              {t.dashboard.viewDayPlan}
               <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -61,7 +66,9 @@ export default function Dashboard() {
             </div>
             <p className="text-sm text-muted-foreground mb-3">{t.dashboard.todayGoalDesc}</p>
             <Button size="sm" asChild>
-              <Link to="/modules/m1">{t.dashboard.continue} <ArrowRight className="ml-1 h-3 w-3" /></Link>
+              <Link to={continueHref}>
+                {t.dashboard.continue} <ArrowRight className="ml-1 h-3 w-3" />
+              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -74,7 +81,9 @@ export default function Dashboard() {
             </div>
             <p className="text-sm text-muted-foreground mb-1">{t.dashboard.feedbackExercise}</p>
             <p className="text-xs text-success font-medium mb-3">{t.dashboard.feedbackScore}</p>
-            <Button variant="outline" size="sm">{t.dashboard.viewFeedback}</Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/deliverables/d1/feedback">{t.dashboard.viewFeedback}</Link>
+            </Button>
           </CardContent>
         </Card>
 
@@ -86,7 +95,9 @@ export default function Dashboard() {
             </div>
             <p className="text-sm font-medium">{t.dashboard.mentoringTopic}</p>
             <p className="text-xs text-muted-foreground mb-3">{t.dashboard.mentoringTime}</p>
-            <Button variant="outline" size="sm">{t.dashboard.viewDetails}</Button>
+            <Button variant="outline" size="sm">
+              {t.dashboard.viewDetails}
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -126,7 +137,9 @@ export default function Dashboard() {
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-card/95 backdrop-blur border-t md:hidden">
         <Button className="w-full h-12" asChild>
-          <Link to="/modules/m1">{t.dashboard.continue} <ArrowRight className="ml-1 h-4 w-4" /></Link>
+          <Link to={continueHref}>
+            {t.dashboard.continue} <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
         </Button>
       </div>
     </div>

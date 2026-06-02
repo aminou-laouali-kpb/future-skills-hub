@@ -2,21 +2,26 @@ import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useDeliverables } from "@/hooks/useDeliverables";
 import { ArrowLeft, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 
 export default function Feedback() {
   const { t } = useLanguage();
   const { deliverableId } = useParams();
+  const { getById } = useDeliverables();
+  const deliverable = deliverableId ? getById(deliverableId) : undefined;
+  const feedbackData = deliverable?.feedback;
 
-  // Mock feedback data
-  const feedbackData = {
-    score: 78,
-    strengths: "Tu as bien identifié les 3 signes principaux d'un email de phishing. L'analyse est claire et structurée.",
-    improvements: "Ajoute des exemples concrets tirés de ton expérience. La partie sur les liens suspects peut être approfondie.",
-    nextSteps: "Refais l'exercice avec les 2 nouveaux emails fournis et compare tes réponses avec le corrigé.",
-    mentorName: "Moussa K.",
-    date: "2025-03-17",
-  };
+  if (!feedbackData) {
+    return (
+      <div className="container max-w-2xl py-12 text-center">
+        <p className="text-muted-foreground mb-4">{t.common.noResults}</p>
+        <Button variant="outline" asChild>
+          <Link to="/deliverables">{t.feedback.backToDeliverables}</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container max-w-2xl py-6 space-y-6 animate-fade-in">
@@ -26,17 +31,17 @@ export default function Feedback() {
 
       <div>
         <h1 className="text-xl font-bold">{t.feedback.title}</h1>
-        <p className="text-sm text-muted-foreground">Par {feedbackData.mentorName} — {feedbackData.date}</p>
+        <p className="text-sm text-muted-foreground">
+          {feedbackData.mentorName} — {feedbackData.date}
+        </p>
       </div>
 
-      {feedbackData.score && (
-        <Card className="shadow-card">
-          <CardContent className="p-6 text-center">
-            <p className="text-sm text-muted-foreground mb-1">{t.feedback.score}</p>
-            <p className="text-4xl font-bold text-primary">{feedbackData.score}%</p>
-          </CardContent>
-        </Card>
-      )}
+      <Card className="shadow-card">
+        <CardContent className="p-6 text-center">
+          <p className="text-sm text-muted-foreground mb-1">{t.feedback.score}</p>
+          <p className="text-4xl font-bold text-primary">{feedbackData.score}%</p>
+        </CardContent>
+      </Card>
 
       <Card className="shadow-card border-l-4 border-l-success">
         <CardContent className="p-5">
@@ -69,8 +74,10 @@ export default function Feedback() {
       </Card>
 
       <div className="flex justify-center pt-4">
-        <Button size="lg">
-          {t.feedback.resubmit} <ArrowRight className="ml-1 h-4 w-4" />
+        <Button size="lg" asChild>
+          <Link to="/deliverables">
+            {t.feedback.resubmit} <ArrowRight className="ml-1 h-4 w-4" />
+          </Link>
         </Button>
       </div>
     </div>
