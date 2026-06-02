@@ -112,6 +112,22 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["deliverable_feedback"]["Insert"]>;
       };
+      mentoring_registrations: {
+        Row: { user_id: string; session_id: string; registered_at: string };
+        Insert: { user_id: string; session_id: string; registered_at?: string };
+        Update: Partial<Database["public"]["Tables"]["mentoring_registrations"]["Insert"]>;
+      };
+      issued_certificates: {
+        Row: { user_id: string; learner_name: string; cohort_code: string; issued_at: string };
+        Insert: { user_id: string; learner_name: string; cohort_code: string; issued_at?: string };
+        Update: Partial<Database["public"]["Tables"]["issued_certificates"]["Insert"]>;
+      };
+    };
+    Functions: {
+      mentoring_spots_left: {
+        Args: { p_session_id: string; p_capacity: number };
+        Returns: number;
+      };
     };
   };
 }

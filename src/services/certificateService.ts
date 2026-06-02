@@ -1,4 +1,6 @@
 import { MODULE_IDS } from "@/data/curriculum";
+import { canSyncToSupabase } from "@/lib/userId";
+import { fetchRemoteIssuedCertificate, pushRemoteIssuedCertificate } from "@/services/certificateRemoteService";
 import { loadDeliverables } from "@/services/deliverableService";
 import { hasMentoringRequirement } from "@/services/mentoringService";
 import {
@@ -43,14 +45,15 @@ export function getCompletedModulesCount(progress: UserProgressData): number {
 }
 
 export function countSubmittedDeliverables(userId: string): number {
-  return loadDeliverables(userId).filter((d) => d.status === "submitted" || d.status === "feedback").length;
+  return loadDeliverables(userId, { skipSeed: canSyncToSupabase(userId) }).filter(
+    (d) => d.status === "submitted" || d.status === "feedback"
+  ).length;
 }
 
 export function evaluateCertificateEligibility(
   userId: string,
   progress: UserProgressData
 ): CertificateEligibility {
-  const completedSet = new Set(progress.completedLessonIds);
   const completedModulesCount = getCompletedModulesCount(progress);
   const modulesMet = completedModulesCount >= MODULE_IDS.length;
   const deliverableCount = countSubmittedDeliverables(userId);
@@ -94,6 +97,11 @@ export function getIssuedCertificate(userId: string): IssuedCertificate | null {
   return null;
 }
 
+export function saveIssuedCertificateLocal(userId: string, issued: IssuedCertificate): void {
+  localStorage.setItem(issuedKey(userId), JSON.stringify(issued));
+  window.dispatchEvent(new Event("fs-certificate-updated"));
+}
+
 export function issueCertificate(
   userId: string,
   learnerName: string,
@@ -109,7 +117,23 @@ export function issueCertificate(
     learnerName,
     cohortCode,
   };
-  localStorage.setItem(issuedKey(userId), JSON.stringify(issued));
-  window.dispatchEvent(new Event("fs-certificate-updated"));
+
+  saveIssuedCertificateLocal(userId, issued);
+
+  if (canSyncToSupabase(userId)) {
+    void pushRemoteIssuedCertificate(userId, issued).catch((err) => {
+      console.warn("[Future Skills] certificate sync failed", err);
+    });
+  }
+
   return issued;
+}
+
+export function applyIssuedCertificateLocal(userId: string, issued: IssuedCertificate | null): void {
+  if (issued) {
+    saveIssuedCertificateLocal(userId, issued);
+  } else {
+    localStorage.removeItem(issuedKey(userId));
+    window.dispatchEvent(new Event("fs-certificate-updated"));
+  }
 }
