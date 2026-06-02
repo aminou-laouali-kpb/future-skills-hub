@@ -11,6 +11,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import * as authService from "@/services/authService";
 import { completeOnboarding, getProfile } from "@/services/profileService";
+import { hydrateLearnerFromSupabase } from "@/services/learnerSyncService";
 import {
   type LearnerProfile,
   type OnboardingPayload,
@@ -46,6 +47,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(p);
     if (c) setContact(c);
     else if (p?.contact) setContact(p.contact);
+    try {
+      await hydrateLearnerFromSupabase(u.id);
+    } catch (err) {
+      console.warn("[Future Skills] learner hydrate failed", err);
+    }
   }, []);
 
   useEffect(() => {

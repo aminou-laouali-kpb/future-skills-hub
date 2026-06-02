@@ -1,3 +1,6 @@
+import { canSyncToSupabase } from "@/lib/userId";
+import { insertRemoteDeliverable } from "@/services/deliverableRemoteService";
+
 export type DeliverableStatus = "draft" | "submitted" | "feedback" | "overdue";
 
 export interface DeliverableFeedback {
@@ -49,13 +52,18 @@ function seedDefaults(): Deliverable[] {
   ];
 }
 
-export function loadDeliverables(userId: string): Deliverable[] {
+export function loadDeliverables(userId: string, options?: { skipSeed?: boolean }): Deliverable[] {
   try {
     const raw = localStorage.getItem(storageKey(userId));
     if (raw) return JSON.parse(raw) as Deliverable[];
   } catch {
     /* empty */
   }
+
+  if (options?.skipSeed || canSyncToSupabase(userId)) {
+    return [];
+  }
+
   const seeded = seedDefaults();
   saveDeliverables(userId, seeded);
   return seeded;
@@ -65,12 +73,11 @@ export function saveDeliverables(userId: string, items: Deliverable[]) {
   localStorage.setItem(storageKey(userId), JSON.stringify(items));
 }
 
-export function createDeliverable(
+export async function createDeliverable(
   userId: string,
   input: Omit<Deliverable, "id" | "status" | "submittedAt" | "feedback"> & { asDraft: boolean }
-): Deliverable {
-  const list = loadDeliverables(userId);
-  const item: Deliverable = {
+): Promise<Deliverable> {
+  const draft: Deliverable = {
     id: `d-${Date.now()}`,
     moduleId: input.moduleId,
     type: input.type,
@@ -80,11 +87,24 @@ export function createDeliverable(
     status: input.asDraft ? "draft" : "submitted",
     submittedAt: input.asDraft ? undefined : new Date().toISOString().slice(0, 10),
   };
-  list.unshift(item);
+
+  if (canSyncToSupabase(userId)) {
+    try {
+      const remote = await insertRemoteDeliverable(userId, draft);
+      const list = loadDeliverables(userId, { skipSeed: true });
+      saveDeliverables(userId, [remote, ...list]);
+      return remote;
+    } catch (err) {
+      console.warn("[Future Skills] create deliverable remote failed", err);
+    }
+  }
+
+  const list = loadDeliverables(userId, { skipSeed: !canSyncToSupabase(userId) });
+  list.unshift(draft);
   saveDeliverables(userId, list);
-  return item;
+  return draft;
 }
 
 export function getDeliverable(userId: string, id: string): Deliverable | undefined {
-  return loadDeliverables(userId).find((d) => d.id === id);
+  return loadDeliverables(userId, { skipSeed: true }).find((d) => d.id === id);
 }
