@@ -11,12 +11,15 @@ import { useLearnerDisplay } from "@/hooks/useLearnerDisplay";
 import { useProgressStore } from "@/hooks/useProgress";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { RecommendationCard } from "@/components/RecommendationCard";
+import { CertificatePanel } from "@/components/CertificatePanel";
+import { useCertificate } from "@/hooks/useCertificate";
 
 export default function Dashboard() {
   const { t } = useLanguage();
   const learner = useLearnerDisplay();
   const { modules } = useProgressStore();
   const { primary, secondary } = useRecommendations();
+  const { issued } = useCertificate();
   const { streakDays } = useLiteMode();
   const progressPercent = Math.round((learner.day / learner.totalDays) * 100);
   const continueModule = modules.find((m) => m.status === "in_progress") ?? modules.find((m) => m.status !== "locked");
@@ -40,7 +43,7 @@ export default function Dashboard() {
           </span>
           <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
             <Award className="h-3.5 w-3.5" />
-            {t.dashboard.certifiedBadgeShort}
+            {issued ? t.certificate.badgeEarned : t.dashboard.certifiedBadgeShort}
           </span>
         </div>
       </div>
@@ -59,6 +62,8 @@ export default function Dashboard() {
       </Card>
 
       <CohortProgress />
+
+      <CertificatePanel />
 
       {primary && (
         <div className="space-y-3">
