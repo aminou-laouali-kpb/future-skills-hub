@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LiteModeProvider } from "@/contexts/LiteModeContext";
+import { AppLayout } from "@/components/AppLayout";
 import { Navbar } from "@/components/Navbar";
 import { WhatsAppFab } from "@/components/WhatsAppFab";
 import { ConnectionStatus } from "@/components/ConnectionStatus";
@@ -31,33 +32,37 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <LanguageProvider>
-        <LiteModeProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/onboarding" element={<Onboarding />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/modules" element={<Modules />} />
-              <Route path="/modules/:moduleId" element={<ModuleDetail />} />
-              <Route path="/modules/:moduleId/quiz" element={<Quiz />} />
-              <Route path="/deliverables" element={<Deliverables />} />
-              <Route path="/deliverables/:deliverableId/feedback" element={<Feedback />} />
-              <Route path="/mentoring" element={<Mentoring />} />
-              <Route path="/resources" element={<Resources />} />
-              <Route path="/plan-jour" element={<DayPlan />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/support" element={<Support />} />
-              <Route path="/faq" element={<Support />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <WhatsAppFab />
-            <ConnectionStatus />
-          </BrowserRouter>
-        </LiteModeProvider>
+        <AuthProvider>
+          <LiteModeProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Navbar />
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/onboarding" element={<Onboarding />} />
+                <Route element={<AppLayout />}>
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/modules" element={<Modules />} />
+                  <Route path="/modules/:moduleId" element={<ModuleDetail />} />
+                  <Route path="/modules/:moduleId/quiz" element={<Quiz />} />
+                  <Route path="/deliverables" element={<Deliverables />} />
+                  <Route path="/deliverables/:deliverableId/feedback" element={<Feedback />} />
+                  <Route path="/mentoring" element={<Mentoring />} />
+                  <Route path="/resources" element={<Resources />} />
+                  <Route path="/plan-jour" element={<DayPlan />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/support" element={<Support />} />
+                  <Route path="/faq" element={<Support />} />
+                  <Route path="*" element={<NotFound />} />
+                </Route>
+              </Routes>
+              <WhatsAppFab />
+              <ConnectionStatus />
+            </BrowserRouter>
+          </LiteModeProvider>
+        </AuthProvider>
       </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>

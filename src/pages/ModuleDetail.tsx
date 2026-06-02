@@ -6,6 +6,9 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { CheckCircle2, Circle, ArrowLeft, ArrowRight, FileText, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { OfflineBanner } from "@/components/OfflineBanner";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { cacheLesson, getCachedLesson } from "@/lib/offlineLessons";
 import { useLessonsWithProgress, useModule, useProgressStore } from "@/hooks/useProgress";
 
 export default function ModuleDetail() {
@@ -14,6 +17,7 @@ export default function ModuleDetail() {
   const mod = useModule(moduleId);
   const lessons = useLessonsWithProgress(moduleId);
   const { completeLesson } = useProgressStore();
+  const online = useOnlineStatus();
   const [activeLesson, setActiveLesson] = useState(lessons[0]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -22,6 +26,12 @@ export default function ModuleDetail() {
       setActiveLesson(lessons.find((l) => !l.completed) ?? lessons[0]);
     }
   }, [moduleId, lessons.length]);
+
+  useEffect(() => {
+    if (online && activeLesson) {
+      cacheLesson(activeLesson);
+    }
+  }, [online, activeLesson?.id]);
 
   if (!mod || !moduleId) {
     return (
@@ -50,6 +60,8 @@ export default function ModuleDetail() {
     return null;
   }
 
+  const cached = !online ? getCachedLesson(activeLesson.id) : null;
+  const displayLesson = cached ? { ...activeLesson, ...cached, completed: activeLesson.completed } : activeLesson;
   const currentIndex = lessons.findIndex((l) => l.id === activeLesson.id);
 
   const handleMarkDone = () => {
@@ -126,29 +138,33 @@ export default function ModuleDetail() {
 
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto px-4 py-6 md:py-10 pb-28 md:pb-10 animate-fade-in">
+          <OfflineBanner />
+          {cached && (
+            <p className="mb-4 text-xs font-medium text-muted-foreground">{t.offline.cachedBadge}</p>
+          )}
           <div className="flex items-center gap-2 text-xs text-muted-foreground mb-4">
             <span>{mod.shortTitle}</span>
             <span>›</span>
             <span>
-              {t.moduleDetail.lesson} {activeLesson.order}/{lessons.length}
+              {t.moduleDetail.lesson} {displayLesson.order}/{lessons.length}
             </span>
-            <span className="ml-auto">{activeLesson.duration}</span>
+            <span className="ml-auto">{displayLesson.duration}</span>
           </div>
 
-          <h1 className="text-xl md:text-2xl font-bold mb-6">{activeLesson.title}</h1>
+          <h1 className="text-xl md:text-2xl font-bold mb-6">{displayLesson.title}</h1>
 
-          {activeLesson.videoId && (
+          {displayLesson.videoId && (
             <VideoPlayer
-              videoId={activeLesson.videoId}
-              title={activeLesson.title}
-              durationSec={activeLesson.videoDurationSec}
-              sizeMB={activeLesson.videoSizeMB}
-              transcript={activeLesson.transcript}
+              videoId={displayLesson.videoId}
+              title={displayLesson.title}
+              durationSec={displayLesson.videoDurationSec}
+              sizeMB={displayLesson.videoSizeMB}
+              transcript={displayLesson.transcript}
             />
           )}
 
           <div className="prose prose-sm max-w-none text-foreground leading-relaxed">
-            <p className="text-muted-foreground">{activeLesson.content}</p>
+            <p className="text-muted-foreground">{displayLesson.content}</p>
             <div className="my-8 p-6 rounded-xl bg-muted/50 border">
               <h3 className="font-semibold text-sm mb-2">{t.moduleDetail.remember}</h3>
               <p className="text-sm text-muted-foreground">{t.moduleDetail.rememberText}</p>
