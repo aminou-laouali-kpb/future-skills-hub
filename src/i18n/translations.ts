@@ -781,6 +781,9 @@ export const translations = {
       viewDetails: "Duba bayanai",
       yourModules: "Darussanka",
       unlockPrev: "Kammala darasi na baya don buɗewa",
+      streakDays: "kwanaki",
+      certifiedBadgeShort: "FS 2025",
+      viewDayPlan: "Duba shirin kwana 10",
     },
     modules: {
       catalog: "Jerin darussa",
