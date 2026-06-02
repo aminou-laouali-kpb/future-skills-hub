@@ -1,75 +1,61 @@
-# Welcome to your Lovable project
+# Future Skills LMS (Niger)
 
-## Project info
+Plateforme d’apprentissage **Future Skills 2025** — React, Vite, TypeScript, shadcn/ui, Tailwind, Supabase.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+**Production** : hébergée sur **[Lovable](https://lovable.dev)**. Ce dépôt GitHub alimente Lovable ; publiez depuis Lovable après chaque mise à jour de `main`.
 
-## How can I edit this code?
+## Démarrage rapide (Lovable)
 
-There are several ways of editing your application.
+1. S’assurer que **`main`** est à jour sur GitHub.
+2. Ouvrir le projet Lovable lié à ce repo.
+3. Configurer **Supabase** (variables + migrations) — voir **[docs/LOVABLE.md](docs/LOVABLE.md)**.
+4. **Share → Publish** dans Lovable.
 
-**Use Lovable**
+Guide complet : **[docs/LOVABLE.md](docs/LOVABLE.md)**.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+## Développement local
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+git clone https://github.com/kpb-global/future-skills-hub.git
+cd future-skills-hub
+npm install
+cp .env.example .env
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Sans `.env` : **mode démo** (OTP `123456`, `localStorage`).
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+| Commande | Description |
+|----------|-------------|
+| `npm run dev` | Serveur de dev (port 8080) |
+| `npm test` | Tests Vitest |
+| `npm run build` | Build production |
+| `npm run db:push` | Migrations Supabase (CLI liée) |
 
-**Use GitHub Codespaces**
+## Stack
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Vite · React 18 · TypeScript
+- shadcn/ui · Tailwind CSS
+- Supabase (auth OTP, progression, livrables, mentorat, certificats)
+- PWA (`vite-plugin-pwa`)
 
-## What technologies are used for this project?
+## Documentation
 
-This project is built with:
+| Fichier | Sujet |
+|---------|--------|
+| [docs/LOVABLE.md](docs/LOVABLE.md) | **Publier et actualiser sur Lovable** |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | CI, artefact `dist`, GitHub Pages (optionnel) |
+| [supabase/README.md](supabase/README.md) | Migrations SQL |
+| [docs/SPRINTS_AGENTS.md](docs/SPRINTS_AGENTS.md) | Sprints d’intégration |
+| [docs/Matrice_exigences_FuturSkills.md](docs/Matrice_exigences_FuturSkills.md) | Exigences produit |
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Lovable (édition visuelle / prompts)
 
-## How can I deploy this project?
+Le projet peut aussi être modifié sur Lovable ; les commits sont poussés vers ce dépôt.
 
-**Production (recommandé)** : voir [docs/DEPLOY.md](docs/DEPLOY.md) — GitHub Pages sur `main` + secrets Supabase.
+- Remplacer `REPLACE_WITH_PROJECT_ID` dans les liens Lovable par l’ID de votre projet si vous copiez ce README ailleurs.
+- Domaine personnalisé : Lovable → **Settings → Domains** — [documentation](https://docs.lovable.dev/features/custom-domain).
 
-**Lovable** : Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## CI
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Sur chaque push vers `main` : `npm test` + `npm run build` (workflow **CI**). Pas de déploiement automatique vers GitHub Pages — la prod est sur Lovable.
