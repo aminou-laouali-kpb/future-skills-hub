@@ -4,7 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { toast } from "sonner";
 
 export function ConnectionStatus() {
-  const { lang } = useLanguage();
+  const { t } = useLanguage();
   const [online, setOnline] = useState(navigator.onLine);
   const [effectiveType, setEffectiveType] = useState<string>("");
 
@@ -17,11 +17,11 @@ export function ConnectionStatus() {
     update();
     const onOnline = () => {
       setOnline(true);
-      toast.success(lang === "fr" ? "Connexion rétablie" : "Back online");
+      toast.success(t.connection.backOnline);
     };
     const onOffline = () => {
       setOnline(false);
-      toast.error(lang === "fr" ? "Tu es hors ligne" : "You are offline");
+      toast.error(t.connection.offline);
     };
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
@@ -33,7 +33,7 @@ export function ConnectionStatus() {
       // @ts-ignore
       navigator.connection?.removeEventListener?.("change", update);
     };
-  }, [lang]);
+  }, [t]);
 
   if (online && !effectiveType) return null;
 
@@ -44,7 +44,7 @@ export function ConnectionStatus() {
       }`}
     >
       {online ? <Wifi className="h-3.5 w-3.5" /> : <WifiOff className="h-3.5 w-3.5" />}
-      <span>{online ? effectiveType.toUpperCase() || "ON" : lang === "fr" ? "Hors ligne" : "Offline"}</span>
+      <span>{online ? effectiveType.toUpperCase() || "ON" : t.connection.offlineLabel}</span>
     </div>
   );
 }

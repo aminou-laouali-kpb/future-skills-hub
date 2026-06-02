@@ -11,6 +11,7 @@ export const translations = {
       deliverables: "Livrables",
       admin: "Admin",
       support: "Support",
+      dayPlan: "Plan 10j",
     },
     // Landing
     landing: {
@@ -58,6 +59,11 @@ export const translations = {
       back: "Retour",
       noAccount: "Pas encore inscrit(e) ?",
       register: "Rejoindre une cohorte",
+      codeSent: "Code envoyé ✉️",
+      codeSentTo: "Code envoyé à {contact}",
+      invalidOtp: "Code incorrect. Réessaie.",
+      sendFailed: "Impossible d'envoyer le code.",
+      demoOtpHint: "Mode démo : utilise le code {code}",
     },
     // Onboarding
     onboarding: {
@@ -81,6 +87,8 @@ export const translations = {
       goal: "Objectif principal",
       goalOptions: { employment: "Emploi", entrepreneurship: "Entrepreneuriat", ai: "IA", productivity: "Productivité" },
       whatsapp: "Recevoir des rappels WhatsApp",
+      cohortInvalid: "Code cohorte invalide. Vérifie avec ton formateur.",
+      saving: "Enregistrement…",
     },
     // Dashboard
     dashboard: {
@@ -101,6 +109,9 @@ export const translations = {
       viewDetails: "Voir les détails",
       yourModules: "Tes modules",
       unlockPrev: "Termine le module précédent pour débloquer",
+      streakDays: "jours",
+      certifiedBadgeShort: "Certifié FS 2025",
+      viewDayPlan: "Voir mon plan des 10 jours",
     },
     // Modules
     modules: {
@@ -262,6 +273,50 @@ export const translations = {
         { q: "Comment soumettre un livrable ?", a: "Va dans Livrables > Nouveau livrable, choisis le module et dépose ton fichier ou lien." },
       ],
     },
+    dayPlan: {
+      title: "Plan des 10 jours",
+      subtitle: "Une routine simple, jour par jour, pour réussir ton programme.",
+      dayLabel: "J{day}",
+      minutesShort: "min",
+      days: [
+        { title: "Culture numérique", task: "Leçons 1-3 + quiz intro" },
+        { title: "Culture numérique", task: "Leçons 4-6 + quiz final" },
+        { title: "Outils & productivité", task: "Drive, Notion, organisation" },
+        { title: "Outils & productivité", task: "Mini-projet collaboratif" },
+        { title: "Introduction à l'IA", task: "Comprendre les LLM + prompts" },
+        { title: "Introduction à l'IA", task: "Créer un agent IA simple" },
+        { title: "Employabilité", task: "CV + lettre + email pro" },
+        { title: "Employabilité", task: "Pitch 60s + simulation entretien" },
+        { title: "Entrepreneuriat", task: "Idéation + mini business plan" },
+        { title: "Entrepreneuriat", task: "Pitch final + certificat" },
+      ],
+    },
+    cohortProgress: {
+      title: "Progression de ta cohorte",
+      completed: "ont terminé",
+      topPercent: "Tu es dans le top 30% 💪",
+    },
+    connection: {
+      backOnline: "Connexion rétablie",
+      offline: "Tu es hors ligne",
+      offlineLabel: "Hors ligne",
+    },
+    video: {
+      liteTitle: "Vidéo (mode lite)",
+      openYouTube: "Ouvrir sur YouTube",
+      transcript: "Transcription",
+      comingSoon: "Vidéo à venir",
+      playAria: "Lire la vidéo",
+    },
+    liteMode: {
+      label: "Mode Lite",
+      hint: "Économise les données",
+    },
+    whatsapp: {
+      prefillMessage: "Bonjour, j'ai besoin d'aide sur Future Skills.",
+      ariaLabel: "Aide formateur via WhatsApp",
+      label: "Aide",
+    },
     // Status badges
     status: {
       locked: "Verrouillé",
@@ -303,6 +358,7 @@ export const translations = {
       deliverables: "Deliverables",
       admin: "Admin",
       support: "Support",
+      dayPlan: "10-day plan",
     },
     landing: {
       login: "Log in",
@@ -348,6 +404,11 @@ export const translations = {
       back: "Back",
       noAccount: "Don't have an account?",
       register: "Join a cohort",
+      codeSent: "Code sent ✉️",
+      codeSentTo: "Code sent to {contact}",
+      invalidOtp: "Incorrect code. Try again.",
+      sendFailed: "Could not send the code.",
+      demoOtpHint: "Demo mode: use code {code}",
     },
     onboarding: {
       step: "Step",
@@ -370,6 +431,8 @@ export const translations = {
       goal: "Main goal",
       goalOptions: { employment: "Employment", entrepreneurship: "Entrepreneurship", ai: "AI", productivity: "Productivity" },
       whatsapp: "Receive WhatsApp reminders",
+      cohortInvalid: "Invalid cohort code. Check with your instructor.",
+      saving: "Saving…",
     },
     dashboard: {
       hello: "Hi",
@@ -389,6 +452,9 @@ export const translations = {
       viewDetails: "View details",
       yourModules: "Your modules",
       unlockPrev: "Complete the previous module to unlock",
+      streakDays: "days",
+      certifiedBadgeShort: "FS 2025 Certified",
+      viewDayPlan: "View my 10-day plan",
     },
     modules: {
       catalog: "Module catalog",
@@ -541,6 +607,50 @@ export const translations = {
         { q: "How do I submit a deliverable?", a: "Go to Deliverables > New deliverable, select the module and upload your file or link." },
       ],
     },
+    dayPlan: {
+      title: "10-day plan",
+      subtitle: "A simple daily routine to complete your program.",
+      dayLabel: "D{day}",
+      minutesShort: "min",
+      days: [
+        { title: "Digital literacy", task: "Lessons 1-3 + intro quiz" },
+        { title: "Digital literacy", task: "Lessons 4-6 + final quiz" },
+        { title: "Tools & productivity", task: "Drive, Notion, organization" },
+        { title: "Tools & productivity", task: "Mini collaborative project" },
+        { title: "Intro to AI", task: "Understanding LLMs + prompts" },
+        { title: "Intro to AI", task: "Build a simple AI agent" },
+        { title: "Employability", task: "CV + cover letter + pro email" },
+        { title: "Employability", task: "60s pitch + interview sim" },
+        { title: "Entrepreneurship", task: "Ideation + mini business plan" },
+        { title: "Entrepreneurship", task: "Final pitch + certificate" },
+      ],
+    },
+    cohortProgress: {
+      title: "Your cohort's progress",
+      completed: "completed",
+      topPercent: "You're in the top 30% 💪",
+    },
+    connection: {
+      backOnline: "Back online",
+      offline: "You are offline",
+      offlineLabel: "Offline",
+    },
+    video: {
+      liteTitle: "Video (lite mode)",
+      openYouTube: "Open on YouTube",
+      transcript: "Transcript",
+      comingSoon: "Video coming soon",
+      playAria: "Play video",
+    },
+    liteMode: {
+      label: "Lite Mode",
+      hint: "Saves data",
+    },
+    whatsapp: {
+      prefillMessage: "Hello, I need help with Future Skills.",
+      ariaLabel: "Get help on WhatsApp",
+      label: "Help",
+    },
     status: {
       locked: "Locked",
       in_progress: "In progress",
@@ -579,6 +689,7 @@ export const translations = {
       deliverables: "Aikace-aikace",
       admin: "Admin",
       support: "Taimako",
+      dayPlan: "Shirin 10k",
     },
     landing: {
       login: "Shiga",
@@ -624,6 +735,11 @@ export const translations = {
       back: "Komawa",
       noAccount: "Ba ka da asusu tukuna?",
       register: "Shiga ƙungiya",
+      codeSent: "An aika lamba ✉️",
+      codeSentTo: "An aika lamba zuwa {contact}",
+      invalidOtp: "Lamba ba daidai ba ce. Sake gwadawa.",
+      sendFailed: "Ba a iya aika lambar ba.",
+      demoOtpHint: "Yanayin demo: yi amfani da lamba {code}",
     },
     onboarding: {
       step: "Mataki",
@@ -839,6 +955,47 @@ export const translations = {
       search: "Nema",
       noResults: "Babu sakamako",
       of: "na",
+    },
+    dayPlan: {
+      title: "Shirin kwana 10",
+      subtitle: "Tsari mai sauƙi don kammala shirin ku.",
+      dayLabel: "K{day}",
+      minutesShort: "min",
+      days: [
+        { title: "Al'adun dijital", task: "Darussa 1-3 + quiz" },
+        { title: "Al'adun dijital", task: "Darussa 4-6 + quiz na ƙarshe" },
+        { title: "Kayan aiki & yawan aiki", task: "Drive, Notion" },
+        { title: "Kayan aiki & yawan aiki", task: "Aikin haɗin gwiwa" },
+        { title: "Gabatar da AI", task: "LLM + prompts" },
+        { title: "Gabatar da AI", task: "Ƙirƙiri agent AI" },
+        { title: "Aikin yi", task: "CV + wasiƙa" },
+        { title: "Aikin yi", task: "Pitch 60s" },
+        { title: "Kasuwanci", task: "Ra'ayi + shirin kasuwanci" },
+        { title: "Kasuwanci", task: "Pitch na ƙarshe + takarda" },
+      ],
+    },
+    cohortProgress: {
+      title: "Ci gaban ƙungiyar ku",
+      completed: "sun kammala",
+      topPercent: "Kuna cikin manyan 30% 💪",
+    },
+    connection: {
+      backOnline: "An dawo da haɗin",
+      offline: "Kuna layi",
+      offlineLabel: "Layi",
+    },
+    video: {
+      liteTitle: "Bidiyo (yanayin lite)",
+      openYouTube: "Buɗe a YouTube",
+      transcript: "Rubutun magana",
+      comingSoon: "Bidiyo yana zuwa",
+      playAria: "Kunna bidiyo",
+    },
+    liteMode: { label: "Yanayin Lite", hint: "Adana data" },
+    whatsapp: {
+      prefillMessage: "Sannu, ina buƙatar taimako akan Future Skills.",
+      ariaLabel: "Taimako ta WhatsApp",
+      label: "Taimako",
     },
     notFound: {
       title: "Ba a sami shafi ba",

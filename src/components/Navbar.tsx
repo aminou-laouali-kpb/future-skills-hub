@@ -19,7 +19,7 @@ export function Navbar() {
     { label: t.nav.deliverables, href: "/deliverables" },
     { label: t.nav.mentoring, href: "/mentoring" },
     { label: t.nav.resources, href: "/resources" },
-    { label: "Plan 10j", href: "/plan-jour" },
+    { label: t.nav.dayPlan, href: "/plan-jour" },
   ];
 
   // Don't show navbar on landing, login, onboarding

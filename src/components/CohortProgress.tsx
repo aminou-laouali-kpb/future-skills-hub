@@ -39,7 +39,7 @@ export function CohortProgress() {
           ))}
         </div>
         <p className="text-xs text-muted-foreground mt-3">
-          {lang === "fr" ? "Tu es dans le top 30% 💪" : "You're in the top 30% 💪"}
+          {t.cohortProgress.topPercent}
         </p>
       </CardContent>
     </Card>

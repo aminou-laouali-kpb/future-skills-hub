@@ -19,10 +19,10 @@ export default function Dashboard() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl md:text-2xl font-bold">
-            {t.dashboard.hello} {currentUser.firstName} 👋
+            {t.dashboard.hello} {learner.firstName} 👋
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            {t.dashboard.dayProgress} {currentUser.day}/{currentUser.totalDays} {t.dashboard.keepGoing}
+            {t.dashboard.dayProgress} {learner.day}/{learner.totalDays} {t.dashboard.keepGoing}
           </p>
         </div>
         <div className="flex items-center gap-2">

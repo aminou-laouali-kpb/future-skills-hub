@@ -6,27 +6,61 @@ import { Label } from "@/components/ui/label";
 import { BookOpen, ArrowRight } from "lucide-react";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { toast } from "@/hooks/use-toast";
+import { MOCK_DEMO_OTP } from "@/lib/supabase";
 
 export default function Login() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { sendOtp, verifyOtp, isMockMode } = useAuth();
   const [step, setStep] = useState<"contact" | "otp">("contact");
   const [contact, setContact] = useState("");
   const [otp, setOtp] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const handleSendCode = (e: React.FormEvent) => {
+  const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!contact.trim()) return;
-    setStep("otp");
-    toast({ title: "Code envoyé ✉️", description: `Code envoyé à ${contact}` });
+    setBusy(true);
+    try {
+      await sendOtp(contact);
+      setStep("otp");
+      toast({
+        title: t.auth.codeSent,
+        description: t.auth.codeSentTo.replace("{contact}", contact),
+      });
+    } catch {
+      toast({ title: t.common.error, description: t.auth.sendFailed, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const handleVerify = () => {
+  const handleVerify = async () => {
     if (otp.length < 6) return;
-    // Mock auth
-    navigate("/onboarding");
+    setBusy(true);
+    try {
+      const p = await verifyOtp(contact, otp);
+      navigate(p?.onboardingCompleted ? "/dashboard" : "/onboarding");
+    } catch {
+      toast({ title: t.common.error, description: t.auth.invalidOtp, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleResend = async () => {
+    setBusy(true);
+    try {
+      await sendOtp(contact);
+      toast({ title: t.auth.codeSent });
+    } catch {
+      toast({ title: t.common.error, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -58,14 +92,23 @@ export default function Login() {
                     className="mt-1.5"
                   />
                 </div>
-                <Button type="submit" className="w-full h-11">
+                {isMockMode && (
+                  <p className="text-xs text-muted-foreground rounded-lg bg-muted p-2">
+                    {t.auth.demoOtpHint.replace("{code}", MOCK_DEMO_OTP)}
+                  </p>
+                )}
+                <Button type="submit" className="w-full h-11" disabled={busy}>
                   {t.auth.sendCode} <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
             </form>
           ) : (
             <div>
-              <button onClick={() => setStep("contact")} className="text-xs text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setStep("contact")}
+                className="text-xs text-muted-foreground hover:text-foreground mb-4 flex items-center gap-1"
+              >
                 ← {t.auth.back}
               </button>
               <h1 className="text-xl font-bold mb-1">{t.auth.otpTitle}</h1>
@@ -83,11 +126,16 @@ export default function Login() {
                 </InputOTP>
               </div>
 
-              <Button onClick={handleVerify} className="w-full h-11" disabled={otp.length < 6}>
+              <Button onClick={handleVerify} className="w-full h-11" disabled={otp.length < 6 || busy}>
                 {t.auth.verify} <ArrowRight className="ml-1 h-4 w-4" />
               </Button>
 
-              <button className="w-full text-center text-xs text-muted-foreground hover:text-primary mt-4 transition-colors">
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={busy}
+                className="w-full text-center text-xs text-muted-foreground hover:text-primary mt-4 transition-colors disabled:opacity-50"
+              >
                 {t.auth.resend}
               </button>
             </div>
@@ -96,7 +144,7 @@ export default function Login() {
 
         <p className="text-center text-xs text-muted-foreground mt-4">
           {t.auth.noAccount}{" "}
-          <button onClick={() => navigate("/onboarding")} className="text-primary hover:underline font-medium">
+          <button type="button" onClick={() => navigate("/onboarding")} className="text-primary hover:underline font-medium">
             {t.auth.register}
           </button>
         </p>

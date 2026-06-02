@@ -5,9 +5,9 @@ import { useLanguage } from "@/i18n/LanguageContext";
 
 export function LiteModeToggle({ compact = false }: { compact?: boolean }) {
   const { isLite, toggleLite } = useLiteMode();
-  const { lang } = useLanguage();
-  const label = lang === "fr" ? "Mode Lite" : "Lite Mode";
-  const hint = lang === "fr" ? "Économise les données" : "Saves data";
+  const { t } = useLanguage();
+  const label = t.liteMode.label;
+  const hint = t.liteMode.hint;
 
   if (compact) {
     return (

@@ -7,28 +7,57 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
+import type { LearnerGoal, LearnerLevel } from "@/types/database";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { BookOpen, ArrowRight, ArrowLeft } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 export default function Onboarding() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { user, saveOnboarding } = useAuth();
   const [step, setStep] = useState(1);
+  const [busy, setBusy] = useState(false);
   const totalSteps = 3;
 
   const [cohortCode, setCohortCode] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [city, setCity] = useState("");
-  const [level, setLevel] = useState("beginner");
-  const [goal, setGoal] = useState("employment");
+  const [level, setLevel] = useState<LearnerLevel>("beginner");
+  const [goal, setGoal] = useState<LearnerGoal>("employment");
   const [whatsapp, setWhatsapp] = useState(false);
   const [phone, setPhone] = useState("");
 
   const progress = (step / totalSteps) * 100;
 
-  const handleFinish = () => {
-    navigate("/dashboard");
+  const handleFinish = async () => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+    if (!firstName.trim() || !lastName.trim()) return;
+
+    setBusy(true);
+    try {
+      await saveOnboarding({
+        cohortCode,
+        firstName,
+        lastName,
+        city,
+        level,
+        goal,
+        whatsappOptIn: whatsapp,
+        phone,
+      });
+      navigate("/dashboard");
+    } catch (e) {
+      const msg = e instanceof Error && e.message === "INVALID_COHORT" ? t.onboarding.cohortInvalid : t.common.error;
+      toast({ title: t.common.error, description: msg, variant: "destructive" });
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -44,7 +73,9 @@ export default function Onboarding() {
 
         <div className="bg-card rounded-2xl shadow-card p-6 animate-fade-in">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>{t.onboarding.step} {step} {t.onboarding.of} {totalSteps}</span>
+            <span>
+              {t.onboarding.step} {step} {t.onboarding.of} {totalSteps}
+            </span>
           </div>
           <Progress value={progress} className="h-1.5 mb-6 [&>div]:bg-primary" />
 
@@ -90,24 +121,30 @@ export default function Onboarding() {
               <h2 className="text-lg font-bold">{t.onboarding.step3Title}</h2>
               <div>
                 <Label className="mb-2 block">{t.onboarding.level}</Label>
-                <RadioGroup value={level} onValueChange={setLevel} className="flex gap-3">
+                <RadioGroup value={level} onValueChange={(v) => setLevel(v as LearnerLevel)} className="flex gap-3">
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="beginner" id="beginner" />
-                    <Label htmlFor="beginner" className="font-normal">{t.onboarding.levelOptions.beginner}</Label>
+                    <Label htmlFor="beginner" className="font-normal">
+                      {t.onboarding.levelOptions.beginner}
+                    </Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <RadioGroupItem value="intermediate" id="intermediate" />
-                    <Label htmlFor="intermediate" className="font-normal">{t.onboarding.levelOptions.intermediate}</Label>
+                    <Label htmlFor="intermediate" className="font-normal">
+                      {t.onboarding.levelOptions.intermediate}
+                    </Label>
                   </div>
                 </RadioGroup>
               </div>
               <div>
                 <Label className="mb-2 block">{t.onboarding.goal}</Label>
-                <RadioGroup value={goal} onValueChange={setGoal} className="grid grid-cols-2 gap-2">
+                <RadioGroup value={goal} onValueChange={(v) => setGoal(v as LearnerGoal)} className="grid grid-cols-2 gap-2">
                   {Object.entries(t.onboarding.goalOptions).map(([key, label]) => (
                     <div key={key} className="flex items-center gap-2">
                       <RadioGroupItem value={key} id={key} />
-                      <Label htmlFor={key} className="font-normal">{label}</Label>
+                      <Label htmlFor={key} className="font-normal">
+                        {label}
+                      </Label>
                     </div>
                   ))}
                 </RadioGroup>
@@ -115,16 +152,12 @@ export default function Onboarding() {
               <div className="space-y-2 pt-2 border-t">
                 <div className="flex items-center gap-2">
                   <Checkbox id="whatsapp" checked={whatsapp} onCheckedChange={(c) => setWhatsapp(!!c)} />
-                  <Label htmlFor="whatsapp" className="font-normal text-sm">{t.onboarding.whatsapp}</Label>
+                  <Label htmlFor="whatsapp" className="font-normal text-sm">
+                    {t.onboarding.whatsapp}
+                  </Label>
                 </div>
                 {whatsapp && (
-                  <Input
-                    type="tel"
-                    placeholder="+227 90 00 00 00"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="mt-1.5"
-                  />
+                  <Input type="tel" placeholder="+227 90 00 00 00" value={phone} onChange={(e) => setPhone(e.target.value)} className="mt-1.5" />
                 )}
               </div>
             </div>
@@ -132,17 +165,22 @@ export default function Onboarding() {
 
           <div className="flex justify-between mt-6">
             {step > 1 ? (
-              <Button variant="outline" onClick={() => setStep(step - 1)}>
+              <Button variant="outline" onClick={() => setStep(step - 1)} disabled={busy}>
                 <ArrowLeft className="h-4 w-4 mr-1" /> {t.onboarding.prev}
               </Button>
-            ) : <div />}
+            ) : (
+              <div />
+            )}
             {step < totalSteps ? (
-              <Button onClick={() => setStep(step + 1)} disabled={step === 1 && !cohortCode.trim()}>
+              <Button
+                onClick={() => setStep(step + 1)}
+                disabled={(step === 1 && !cohortCode.trim()) || (step === 2 && (!firstName.trim() || !lastName.trim()))}
+              >
                 {t.onboarding.next} <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             ) : (
-              <Button onClick={handleFinish}>
-                {t.onboarding.finish} <ArrowRight className="h-4 w-4 ml-1" />
+              <Button onClick={handleFinish} disabled={busy}>
+                {busy ? t.onboarding.saving : t.onboarding.finish} <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             )}
           </div>
