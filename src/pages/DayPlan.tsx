@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Calendar, CheckCircle2, Circle, ArrowRight } from "lucide-react";
+import { Calendar, CheckCircle2, Circle, ArrowRight, Sparkles } from "lucide-react";
 import { modules } from "@/data/mockData";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useLearnerDisplay } from "@/hooks/useLearnerDisplay";
+import { useRecommendations } from "@/hooks/useRecommendations";
+import { isDayPriority } from "@/services/recommendationEngine";
 import { cn } from "@/lib/utils";
 
 const PLAN_META = [
@@ -22,6 +24,7 @@ const PLAN_META = [
 export default function DayPlan() {
   const { t } = useLanguage();
   const learner = useLearnerDisplay();
+  const { primary } = useRecommendations();
   const today = learner.day;
 
   return (
@@ -34,6 +37,21 @@ export default function DayPlan() {
         <p className="text-sm text-muted-foreground mt-1">{t.dayPlan.subtitle}</p>
       </div>
 
+      {primary && (
+        <Card className="shadow-card border-primary/30 bg-primary/5">
+          <CardContent className="p-4 flex items-start gap-3">
+            <Sparkles className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+            <div className="flex-1">
+              <p className="text-xs font-semibold text-primary mb-1">{t.recommendations.forYou}</p>
+              <p className="text-sm font-medium mb-2">{t.recommendations.items[primary.titleKey]}</p>
+              <Link to={primary.href} className="text-xs font-medium text-primary inline-flex items-center gap-1 hover:underline">
+                {t.recommendations.items[primary.ctaKey]} <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <div className="space-y-3">
         {PLAN_META.map((meta, index) => {
           const dayContent = t.dayPlan.days[index];
@@ -41,11 +59,18 @@ export default function DayPlan() {
           const isToday = meta.day === today;
           const mod = modules.find((m) => m.id === meta.moduleId);
           const dayLabel = t.dayPlan.dayLabel.replace("{day}", String(meta.day));
+          const priority = isToday && isDayPriority(meta.moduleId, primary);
+          const openHref = priority && primary ? primary.href : `/modules/${meta.moduleId}`;
 
           return (
             <Card
               key={meta.day}
-              className={cn("transition-all", isToday && "ring-2 ring-primary shadow-elevated", isPast && "opacity-70")}
+              className={cn(
+                "transition-all",
+                isToday && "ring-2 ring-primary shadow-elevated",
+                priority && "ring-2 ring-accent",
+                isPast && "opacity-70"
+              )}
             >
               <CardContent className="p-4 flex items-center gap-4">
                 <div
@@ -57,19 +82,21 @@ export default function DayPlan() {
                   {isPast ? <CheckCircle2 className="h-5 w-5" /> : <span className="text-sm">{dayLabel}</span>}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-xs font-bold text-primary">{mod?.shortTitle}</span>
                     <h3 className="text-sm font-semibold truncate">{dayContent?.title ?? mod?.title}</h3>
+                    {priority && (
+                      <span className="text-[10px] font-semibold text-accent bg-accent/15 px-2 py-0.5 rounded-full">
+                        {t.recommendations.forYou}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {dayContent?.task} · ~{meta.durationMin} {t.dayPlan.minutesShort}
                   </p>
                 </div>
                 {!isPast && (
-                  <Link
-                    to={`/modules/${meta.moduleId}`}
-                    className="text-xs font-medium text-primary inline-flex items-center gap-1 hover:underline flex-shrink-0"
-                  >
+                  <Link to={openHref} className="text-xs font-medium text-primary inline-flex items-center gap-1 hover:underline flex-shrink-0">
                     {t.modules.open} <ArrowRight className="h-3 w-3" />
                   </Link>
                 )}

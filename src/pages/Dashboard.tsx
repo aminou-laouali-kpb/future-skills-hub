@@ -9,11 +9,14 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useLiteMode } from "@/contexts/LiteModeContext";
 import { useLearnerDisplay } from "@/hooks/useLearnerDisplay";
 import { useProgressStore } from "@/hooks/useProgress";
+import { useRecommendations } from "@/hooks/useRecommendations";
+import { RecommendationCard } from "@/components/RecommendationCard";
 
 export default function Dashboard() {
   const { t } = useLanguage();
   const learner = useLearnerDisplay();
   const { modules } = useProgressStore();
+  const { primary, secondary } = useRecommendations();
   const { streakDays } = useLiteMode();
   const progressPercent = Math.round((learner.day / learner.totalDays) * 100);
   const continueModule = modules.find((m) => m.status === "in_progress") ?? modules.find((m) => m.status !== "locked");
@@ -57,6 +60,18 @@ export default function Dashboard() {
 
       <CohortProgress />
 
+      {primary && (
+        <div className="space-y-3">
+          <h2 className="text-lg font-semibold">{t.recommendations.sectionTitle}</h2>
+          <RecommendationCard recommendation={primary} variant="primary" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {secondary.map((r) => (
+              <RecommendationCard key={r.id} recommendation={r} variant="secondary" />
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card className="shadow-card hover:shadow-elevated transition-shadow">
           <CardContent className="p-4">
@@ -64,9 +79,11 @@ export default function Dashboard() {
               <Target className="h-4 w-4 text-primary" />
               {t.dashboard.todayGoal}
             </div>
-            <p className="text-sm text-muted-foreground mb-3">{t.dashboard.todayGoalDesc}</p>
+            <p className="text-sm text-muted-foreground mb-3">
+              {primary ? t.recommendations.items.nextLessonDesc : t.dashboard.todayGoalDesc}
+            </p>
             <Button size="sm" asChild>
-              <Link to={continueHref}>
+              <Link to={primary?.href ?? continueHref}>
                 {t.dashboard.continue} <ArrowRight className="ml-1 h-3 w-3" />
               </Link>
             </Button>
