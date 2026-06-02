@@ -9,12 +9,20 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, CheckCircle2, XCircle, RotateCcw, BookOpen } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useRecommendations } from "@/hooks/useRecommendations";
+import { RecommendationCard } from "@/components/RecommendationCard";
+import { getPrimaryRecommendation } from "@/services/recommendationEngine";
+import { useDeliverables } from "@/hooks/useDeliverables";
+import { useLearnerDisplay } from "@/hooks/useLearnerDisplay";
+import type { Recommendation } from "@/types/recommendation";
 
 export default function Quiz() {
   const { moduleId } = useParams();
   const { t } = useLanguage();
   const mod = useModule(moduleId);
-  const { recordQuiz } = useProgressStore();
+  const { recordQuiz, progress: userProgress, modules } = useProgressStore();
+  const { deliverables } = useDeliverables();
+  const learner = useLearnerDisplay();
   const questions = moduleId ? getQuizForModule(moduleId) : [];
 
   const [currentQ, setCurrentQ] = useState(0);
@@ -22,6 +30,7 @@ export default function Quiz() {
   const [answered, setAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [postReco, setPostReco] = useState<import("@/types/recommendation").Recommendation | null>(null);
   const [answers, setAnswers] = useState<boolean[]>([]);
 
   if (!questions.length) {
@@ -35,7 +44,7 @@ export default function Quiz() {
   }
 
   const question = questions[currentQ];
-  const progress = ((currentQ + (answered ? 1 : 0)) / questions.length) * 100;
+  const quizProgress = ((currentQ + (answered ? 1 : 0)) / questions.length) * 100;
 
   const handleSelect = (index: number) => {
     if (!answered) setSelected(index);
@@ -52,7 +61,15 @@ export default function Quiz() {
   const handleNext = () => {
     if (currentQ + 1 >= questions.length) {
       const pct = Math.round((score / questions.length) * 100);
-      if (moduleId) recordQuiz(moduleId as ModuleId, pct);
+      let updated = userProgress;
+      if (moduleId) updated = recordQuiz(moduleId as ModuleId, pct);
+      const reco = getPrimaryRecommendation({
+        progress: updated,
+        modules,
+        deliverables,
+        learner: { goal: learner.goal, programDay: learner.day, level: learner.level },
+      });
+      setPostReco(reco);
       setFinished(true);
     } else {
       setCurrentQ((q) => q + 1);
@@ -98,6 +115,12 @@ export default function Quiz() {
             </div>
           ))}
         </div>
+        {postReco && (
+          <div className="mb-6 text-left max-w-md mx-auto">
+            <p className="text-sm font-semibold mb-2 text-center">{t.recommendations.nextStep}</p>
+            <RecommendationCard recommendation={postReco} variant="secondary" />
+          </div>
+        )}
         <div className="flex gap-3 justify-center">
           {!passed && (
             <Button variant="outline" onClick={handleRetry}>
@@ -125,7 +148,7 @@ export default function Quiz() {
             {t.quiz.question} {currentQ + 1}/{questions.length}
           </span>
         </div>
-        <Progress value={progress} className="h-2 [&>div]:bg-primary" />
+        <Progress value={quizProgress} className="h-2 [&>div]:bg-primary" />
       </div>
 
       <p className="text-xs text-muted-foreground mb-2">{t.quiz.noStress}</p>
