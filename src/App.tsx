@@ -24,6 +24,7 @@ import Resources from "./pages/Resources";
 import Admin from "./pages/Admin";
 import Support from "./pages/Support";
 import DayPlan from "./pages/DayPlan";
+import Certificate from "./pages/Certificate";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ const App = () => (
                   <Route path="/mentoring" element={<Mentoring />} />
                   <Route path="/resources" element={<Resources />} />
                   <Route path="/plan-jour" element={<DayPlan />} />
+                  <Route path="/certificate" element={<Certificate />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/support" element={<Support />} />
                   <Route path="/faq" element={<Support />} />
