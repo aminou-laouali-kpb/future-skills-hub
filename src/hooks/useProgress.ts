@@ -56,8 +56,9 @@ export function useProgressStore() {
 
   const recordQuiz = useCallback(
     (moduleId: ModuleId, percent: number) => {
-      saveQuizScore(userId, moduleId, percent);
+      const updated = saveQuizScore(userId, moduleId, percent);
       bump();
+      return updated;
     },
     [userId, bump]
   );
