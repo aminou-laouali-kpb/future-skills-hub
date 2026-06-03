@@ -52,16 +52,30 @@ function seedDefaults(): Deliverable[] {
   ];
 }
 
+const EMPTY_DELIVERABLES: Deliverable[] = [];
+const deliverablesCache = new Map<string, { raw: string; data: Deliverable[] }>();
+
 export function loadDeliverables(userId: string, options?: { skipSeed?: boolean }): Deliverable[] {
+  let raw: string | null = null;
   try {
-    const raw = localStorage.getItem(storageKey(userId));
-    if (raw) return JSON.parse(raw) as Deliverable[];
+    raw = localStorage.getItem(storageKey(userId));
   } catch {
     /* empty */
   }
+  if (raw) {
+    const cached = deliverablesCache.get(userId);
+    if (cached && cached.raw === raw) return cached.data;
+    try {
+      const data = JSON.parse(raw) as Deliverable[];
+      deliverablesCache.set(userId, { raw, data });
+      return data;
+    } catch {
+      /* fall through */
+    }
+  }
 
   if (options?.skipSeed || canSyncToSupabase(userId)) {
-    return [];
+    return EMPTY_DELIVERABLES;
   }
 
   const seeded = seedDefaults();
@@ -70,7 +84,9 @@ export function loadDeliverables(userId: string, options?: { skipSeed?: boolean 
 }
 
 export function saveDeliverables(userId: string, items: Deliverable[]) {
-  localStorage.setItem(storageKey(userId), JSON.stringify(items));
+  const raw = JSON.stringify(items);
+  localStorage.setItem(storageKey(userId), raw);
+  deliverablesCache.set(userId, { raw, data: items });
 }
 
 export async function createDeliverable(
