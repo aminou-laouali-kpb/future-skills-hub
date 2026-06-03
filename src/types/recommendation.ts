@@ -14,10 +14,10 @@ export interface Recommendation {
   type: RecommendationType;
   priority: number;
   href: string;
-  titleKey: keyof RecommendationCopyKeys;
-  descriptionKey: keyof RecommendationCopyKeys;
-  reasonKey: keyof RecommendationCopyKeys;
-  ctaKey: keyof RecommendationCopyKeys;
+  titleKey: RecommendationCopyKeys;
+  descriptionKey: RecommendationCopyKeys;
+  reasonKey: RecommendationCopyKeys;
+  ctaKey: RecommendationCopyKeys;
   reasonParams?: Record<string, string>;
 }
 
