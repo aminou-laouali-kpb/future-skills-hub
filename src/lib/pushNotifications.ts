@@ -20,13 +20,15 @@ function isPreviewHost(): boolean {
   return h.includes("id-preview--") || h.includes("lovableproject.com") || h === "localhost";
 }
 
-export function pushEnvironmentSupport(): { ok: true } | { ok: false; reason: string } {
+export type PushSupport = { ok: true; reason: null } | { ok: false; reason: string };
+
+export function pushEnvironmentSupport(): PushSupport {
   if (!("serviceWorker" in navigator)) return { ok: false, reason: "no_sw" };
   if (!("PushManager" in window)) return { ok: false, reason: "no_push" };
   if (!("Notification" in window)) return { ok: false, reason: "no_notification" };
   if (isInIframe()) return { ok: false, reason: "iframe" };
   if (isPreviewHost()) return { ok: false, reason: "preview" };
-  return { ok: true };
+  return { ok: true, reason: null };
 }
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
@@ -76,9 +78,13 @@ export async function enablePush(lang: string): Promise<PushStatus> {
 
   let sub = await reg.pushManager.getSubscription();
   if (!sub) {
+    const keyBytes = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
     sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      applicationServerKey: keyBytes.buffer.slice(
+        keyBytes.byteOffset,
+        keyBytes.byteOffset + keyBytes.byteLength
+      ) as ArrayBuffer,
     });
   }
 
