@@ -25,7 +25,7 @@ export function ConnectionStatus() {
     };
     window.addEventListener("online", onOnline);
     window.addEventListener("offline", onOffline);
-    const conn = (navigator as Navigator & { connection?: { addEventListener?: (e: string, fn: () => void) => void } }).connection;
+    const conn = (navigator as Navigator & { connection?: { addEventListener?: (e: string, fn: () => void) => void; removeEventListener?: (e: string, fn: () => void) => void } }).connection;
     conn?.addEventListener?.("change", update);
     return () => {
       window.removeEventListener("online", onOnline);
