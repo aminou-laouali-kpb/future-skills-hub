@@ -7,6 +7,7 @@ import { Calendar, Clock, Users, User, Video, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { MentoringSession } from "@/data/mentoringCatalog";
+import { NotificationSettings } from "@/components/NotificationSettings";
 
 type SessionView = MentoringSession & { registered: boolean; spotsLeft: number };
 
@@ -24,6 +25,9 @@ export default function Mentoring() {
         <h1 className="text-xl md:text-2xl font-bold">{t.mentoring.title}</h1>
         <p className="text-sm text-muted-foreground mt-1">{t.mentoring.subtitle}</p>
       </div>
+
+      <NotificationSettings />
+
 
       <div className="flex gap-2">
         {(["upcoming", "past"] as const).map((v) => (
