@@ -40,6 +40,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,svg,jpg,woff2}"],
         navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/~oauth/],
+        importScripts: ["push-handler.js"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
       devOptions: {
