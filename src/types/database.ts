@@ -21,6 +21,7 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["cohorts"]["Insert"]>;
         Relationships: [];
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -55,17 +56,20 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
         Relationships: [];
+        Relationships: [];
       };
       user_lesson_progress: {
         Row: { user_id: string; lesson_id: string; completed_at: string };
         Insert: { user_id: string; lesson_id: string; completed_at?: string };
         Update: Partial<Database["public"]["Tables"]["user_lesson_progress"]["Insert"]>;
         Relationships: [];
+        Relationships: [];
       };
       user_quiz_scores: {
         Row: { user_id: string; module_id: string; best_percent: number; updated_at: string };
         Insert: { user_id: string; module_id: string; best_percent: number; updated_at?: string };
         Update: Partial<Database["public"]["Tables"]["user_quiz_scores"]["Insert"]>;
+        Relationships: [];
         Relationships: [];
       };
       deliverables: {
@@ -95,6 +99,7 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["deliverables"]["Insert"]>;
         Relationships: [];
+        Relationships: [];
       };
       deliverable_feedback: {
         Row: {
@@ -117,17 +122,20 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["deliverable_feedback"]["Insert"]>;
         Relationships: [];
+        Relationships: [];
       };
       mentoring_registrations: {
         Row: { user_id: string; session_id: string; registered_at: string };
         Insert: { user_id: string; session_id: string; registered_at?: string };
         Update: Partial<Database["public"]["Tables"]["mentoring_registrations"]["Insert"]>;
         Relationships: [];
+        Relationships: [];
       };
       issued_certificates: {
         Row: { user_id: string; learner_name: string; cohort_code: string; issued_at: string };
         Insert: { user_id: string; learner_name: string; cohort_code: string; issued_at?: string };
         Update: Partial<Database["public"]["Tables"]["issued_certificates"]["Insert"]>;
+        Relationships: [];
         Relationships: [];
       };
     };
