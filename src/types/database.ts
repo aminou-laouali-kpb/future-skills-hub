@@ -116,7 +116,15 @@ export interface Database {
           feedback_date?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["deliverable_feedback"]["Insert"]>;
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "deliverable_feedback_deliverable_id_fkey";
+            columns: ["deliverable_id"];
+            isOneToOne: true;
+            referencedRelation: "deliverables";
+            referencedColumns: ["id"];
+          }
+        ];
       };
       mentoring_registrations: {
         Row: { user_id: string; session_id: string; registered_at: string };
