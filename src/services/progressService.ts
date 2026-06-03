@@ -16,18 +16,32 @@ function storageKey(userId: string) {
   return `${STORAGE_PREFIX}${userId}`;
 }
 
+const EMPTY_PROGRESS: UserProgressData = { completedLessonIds: [], quizBestByModule: {} };
+const progressCache = new Map<string, { raw: string; data: UserProgressData }>();
+
 export function loadProgress(userId: string): UserProgressData {
+  let raw: string | null = null;
   try {
-    const raw = localStorage.getItem(storageKey(userId));
-    if (raw) return JSON.parse(raw) as UserProgressData;
+    raw = localStorage.getItem(storageKey(userId));
   } catch {
     /* empty */
   }
-  return { completedLessonIds: [], quizBestByModule: {} };
+  if (!raw) return EMPTY_PROGRESS;
+  const cached = progressCache.get(userId);
+  if (cached && cached.raw === raw) return cached.data;
+  try {
+    const data = JSON.parse(raw) as UserProgressData;
+    progressCache.set(userId, { raw, data });
+    return data;
+  } catch {
+    return EMPTY_PROGRESS;
+  }
 }
 
 export function saveProgress(userId: string, data: UserProgressData): void {
-  localStorage.setItem(storageKey(userId), JSON.stringify(data));
+  const raw = JSON.stringify(data);
+  localStorage.setItem(storageKey(userId), raw);
+  progressCache.set(userId, { raw, data });
 }
 
 export function lessonCompletionPercent(moduleId: string, completedIds: Set<string>): number {
