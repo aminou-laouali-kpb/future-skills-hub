@@ -12,6 +12,7 @@ import { useProgressStore } from "@/hooks/useProgress";
 import { useRecommendations } from "@/hooks/useRecommendations";
 import { RecommendationCard } from "@/components/RecommendationCard";
 import { CertificatePanel } from "@/components/CertificatePanel";
+import { NotificationSettings } from "@/components/NotificationSettings";
 import { useCertificate } from "@/hooks/useCertificate";
 
 export default function Dashboard() {
@@ -64,6 +65,9 @@ export default function Dashboard() {
       <CohortProgress />
 
       <CertificatePanel />
+
+      <NotificationSettings />
+
 
       {primary && (
         <div className="space-y-3">
