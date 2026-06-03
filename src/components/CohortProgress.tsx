@@ -4,7 +4,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { Card, CardContent } from "@/components/ui/card";
 
 export function CohortProgress() {
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   // Mock: anonymous aggregated stats
   const stats = [
     { module: "M1", percent: 68 },
