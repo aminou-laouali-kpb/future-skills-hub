@@ -13,6 +13,10 @@ const INITIAL_SPOTS: Record<string, number> = {
   s3: 0,
 };
 
+const DEFAULT_CACHE_KEY = "__default__";
+const registrationCache = new Map<string, { raw: string | null; data: MentoringRegistrationState }>();
+const sessionsCache = new Map<string, { key: string; data: Array<MentoringSession & { registered: boolean; spotsLeft: number }> }>();
+
 export interface MentoringRegistrationState {
   registeredSessionIds: string[];
   spotsBySession: Record<string, number>;
@@ -27,24 +31,33 @@ function defaultState(): MentoringRegistrationState {
 }
 
 export function loadMentoringRegistrations(userId: string): MentoringRegistrationState {
+  let raw: string | null = null;
   try {
-    const raw = localStorage.getItem(storageKey(userId));
+    raw = localStorage.getItem(storageKey(userId));
+    const cached = registrationCache.get(userId);
+    if (cached && cached.raw === raw) return cached.data;
     if (raw) {
       const parsed = JSON.parse(raw) as MentoringRegistrationState;
-      return {
+      const data = {
         ...defaultState(),
         ...parsed,
         spotsBySession: { ...INITIAL_SPOTS, ...parsed.spotsBySession },
       };
+      registrationCache.set(userId, { raw, data });
+      return data;
     }
   } catch {
     /* empty */
   }
-  return defaultState();
+  const data = defaultState();
+  registrationCache.set(userId, { raw, data });
+  return data;
 }
 
 export function saveMentoringRegistrations(userId: string, state: MentoringRegistrationState): void {
-  localStorage.setItem(storageKey(userId), JSON.stringify(state));
+  const raw = JSON.stringify(state);
+  localStorage.setItem(storageKey(userId), raw);
+  registrationCache.set(userId, { raw, data: state });
 }
 
 export function registerForSession(userId: string, sessionId: string): MentoringRegistrationState {
@@ -80,11 +93,18 @@ export function hasMentoringRequirement(userId: string): number {
 
 export function listSessionsWithRegistration(userId: string) {
   const state = loadMentoringRegistrations(userId);
-  return mentoringSessions.map((session) => ({
+  const cacheKey = registrationCache.get(userId)?.raw ?? DEFAULT_CACHE_KEY;
+  const cached = sessionsCache.get(userId);
+  if (cached && cached.key === cacheKey) return cached.data;
+
+  const data = mentoringSessions.map((session) => ({
     ...session,
     registered: state.registeredSessionIds.includes(session.id),
     spotsLeft: session.past ? 0 : (state.spotsBySession[session.id] ?? 0),
   }));
+
+  sessionsCache.set(userId, { key: cacheKey, data });
+  return data;
 }
 
 /** Replace local cache from Supabase (called on hydrate). */
